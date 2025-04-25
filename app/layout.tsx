@@ -6,7 +6,12 @@ export const metadata = {
   title: "WebFuZsion Web Design Studio",
   description: "Creating exceptional digital experiences that drive results.",
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png" },
+    ],
+    apple: { url: "/icon.png", type: "image/png" },
+    shortcut: { url: "/favicon.png" },
   },
     generator: 'v0.dev'
 }
