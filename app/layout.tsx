@@ -5,6 +5,9 @@ import { ThemeProvider } from "@/components/theme-provider"
 export const metadata = {
   title: "WebFuZsion Web Design Studio",
   description: "Creating exceptional digital experiences that drive results.",
+  icons: {
+    icon: "/favicon.ico",
+  },
     generator: 'v0.dev'
 }
 
