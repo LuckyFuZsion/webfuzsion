@@ -1,0 +1,89 @@
+/* 3D Cube Carousel Styles */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+/* Custom scrollbar for pricing features */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 0, 153, 0.3) rgba(0, 0, 0, 0.1);
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 0, 153, 0.3);
+  border-radius: 4px;
+}
+
+/* Cube face hover effect */
+@media (hover: hover) {
+  .cube-face:hover {
+    transform: scale(1.05);
+  }
+}
+
+/* Cube shadow */
+.cube-shadow {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 20px;
+  background: rgba(255, 0, 153, 0.2);
+  filter: blur(15px);
+  border-radius: 50%;
+}
+
+/* Cube glow effect */
+.cube-glow {
+  position: absolute;
+  inset: -5px;
+  background: radial-gradient(circle at center, rgba(255, 0, 153, 0.2) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.cube-face.active .cube-glow {
+  opacity: 1;
+}
+
+/* Rotation indicator */
+.rotation-indicator {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+}
+
+.rotation-indicator-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.rotation-indicator-dot.active {
+  background-color: rgba(255, 0, 153, 1);
+  width: 16px;
+  border-radius: 4px;
+}
