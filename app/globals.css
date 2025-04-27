@@ -1,6 +1,5 @@
 @import "./fonts.css";
 @import "./custom-logo.css";
-@import "./card-deck.css";
 
 @tailwind base;
 @tailwind components;
@@ -112,4 +111,14 @@
 
 .gradient-text {
   @apply bg-clip-text text-transparent bg-gradient-to-r from-white to-pink-400;
+}
+
+/* Hide scrollbar but maintain functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
 }

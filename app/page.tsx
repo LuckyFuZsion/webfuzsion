@@ -7,7 +7,6 @@ import { Footer } from "@/components/footer"
 import { ServiceCard } from "@/components/service-card"
 import { PricingCard } from "@/components/pricing-card"
 import { PortfolioCard } from "@/components/portfolio-card"
-import { PortfolioCardDeck } from "@/components/portfolio-card-deck"
 import { Button } from "@/components/ui/button"
 import { Laptop, Layout, RefreshCw, Wrench, Phone, Mail, MessageSquare, ArrowRight } from "lucide-react"
 import { AnimatedSection } from "@/components/animated-section"
@@ -21,7 +20,7 @@ import { MagneticButton } from "@/components/magnetic-button"
 import { TextReveal } from "@/components/text-reveal"
 import { TestimonialCarousel } from "@/components/testimonial-carousel"
 import { SectionNavigator } from "@/components/section-navigator"
-import { SeoHeadings } from "@/components/seo-headings"
+import { PortfolioDesktopCarousel } from "@/components/portfolio-desktop-carousel"
 
 export default function Home() {
   const { scrollYProgress } = useScroll()
@@ -194,7 +193,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-brand-dark to-black text-white overflow-hidden">
-      <SeoHeadings />
       <SectionNavigator />
       <TransitionEffect />
       <FloatingElements />
@@ -203,7 +201,7 @@ export default function Home() {
       <Header />
 
       {/* Hero Section */}
-      <section className="pt-28 pb-20 md:pt-40 md:pb-32 relative overflow-hidden" aria-label="Hero">
+      <section className="pt-28 pb-20 md:pt-40 md:pb-32 relative overflow-hidden">
         <motion.div className="container mx-auto px-4 relative z-10" style={{ opacity, scale }}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
@@ -213,17 +211,17 @@ export default function Home() {
                 transition={{ duration: 0.6 }}
                 className="inline-block bg-brand-pink/20 backdrop-blur-sm border border-brand-pink/30 rounded-full px-4 py-1 text-sm text-brand-pink font-medium"
               >
-                <span itemProp="slogan">Web Design Studio</span>
+                Web Design Studio
               </motion.div>
 
               <TextReveal direction="up" delay={0.2}>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight" itemProp="name">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
                   Creating exceptional digital experiences
                 </h1>
               </TextReveal>
 
               <TextReveal direction="up" delay={0.4}>
-                <p className="text-xl text-gray-300" itemProp="description">
+                <p className="text-xl text-gray-300">
                   Professional web design for small businesses, tradesmen, local services, and content creators.
                 </p>
               </TextReveal>
@@ -234,12 +232,12 @@ export default function Home() {
                 transition={{ duration: 0.6, delay: 1 }}
                 className="flex flex-wrap gap-4"
               >
-                <a href="#contact" aria-label="Get Started with WebFuZsion">
+                <a href="#contact">
                   <MagneticButton strength={30}>
                     <Button className="bg-brand-pink hover:bg-brand-pink/80 text-white px-6 py-6">Get Started</Button>
                   </MagneticButton>
                 </a>
-                <a href="#portfolio" aria-label="View Our Portfolio">
+                <a href="#portfolio">
                   <MagneticButton strength={30}>
                     <Button variant="outline" className="border-white/20 text-brand-blue hover:bg-white/10 px-6 py-6">
                       View Our Work
@@ -272,13 +270,12 @@ export default function Home() {
                   }}
                 >
                   <Image
-                    src="/icon.png"
-                    alt="WebFuZsion Web Design Studio Logo"
+                    src="/images/webfuzsion-logo.png"
+                    alt="WebFuZsion Design"
                     width={300}
                     height={300}
                     className="object-contain"
                     priority
-                    itemProp="logo"
                   />
                 </motion.div>
               </div>
@@ -292,22 +289,14 @@ export default function Home() {
       </section>
 
       {/* Services Section */}
-      <section
-        id="services"
-        className="py-20 relative"
-        aria-label="services-heading"
-        itemScope
-        itemType="https://schema.org/Service"
-      >
+      <section id="services" className="py-20 relative">
         <div className="container mx-auto px-4">
           <AnimatedSection className="text-center max-w-3xl mx-auto mb-16">
             <TextReveal>
-              <h2 id="services-heading" className="text-3xl md:text-4xl font-bold mb-4" itemProp="name">
-                Our Services
-              </h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Services</h2>
             </TextReveal>
             <TextReveal delay={0.2}>
-              <p className="text-gray-300" itemProp="description">
+              <p className="text-gray-300">
                 We offer a comprehensive range of web design and development services to help your business succeed
                 online.
               </p>
@@ -317,16 +306,12 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {services.map((service, index) => (
               <AnimatedCard key={index} index={index} delay={0.2}>
-                <div itemScope itemType="https://schema.org/Service">
-                  <ServiceCard
-                    title={service.title}
-                    description={service.description}
-                    icon={service.icon}
-                    gradient={service.gradient}
-                  />
-                  <meta itemProp="name" content={service.title} />
-                  <meta itemProp="description" content={service.description} />
-                </div>
+                <ServiceCard
+                  title={service.title}
+                  description={service.description}
+                  icon={service.icon}
+                  gradient={service.gradient}
+                />
               </AnimatedCard>
             ))}
           </div>
@@ -350,8 +335,13 @@ export default function Home() {
             </TextReveal>
           </AnimatedSection>
 
-          {/* Desktop Portfolio Grid */}
-          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Desktop Carousel View */}
+          <div className="hidden lg:block">
+            <PortfolioDesktopCarousel items={portfolioItems} />
+          </div>
+
+          {/* Mobile and Tablet Grid View */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:hidden gap-8">
             {portfolioItems.map((item, index) => (
               <AnimatedCard key={index} index={index} delay={0.3}>
                 <PortfolioCard
@@ -362,13 +352,6 @@ export default function Home() {
                 />
               </AnimatedCard>
             ))}
-          </div>
-
-          {/* Mobile Portfolio Card Deck */}
-          <div className="md:hidden">
-            <AnimatedSection delay={0.3}>
-              <PortfolioCardDeck items={portfolioItems} />
-            </AnimatedSection>
           </div>
         </div>
 
