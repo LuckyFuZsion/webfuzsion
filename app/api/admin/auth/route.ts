@@ -3,7 +3,14 @@ import { type NextRequest, NextResponse } from "next/server"
 
 export async function POST(request: NextRequest) {
   try {
-    const { username, password } = await request.json()
+    let body;
+    try {
+      body = await request.json();
+    } catch (e) {
+      console.error("Auth API error (invalid JSON):", e);
+      return NextResponse.json({ success: false, message: "Invalid JSON (or empty body) in request." }, { status: 400 });
+    }
+    const { username, password } = body;
 
     // Debug log (will appear in server console)
     console.log("Auth attempt:", {

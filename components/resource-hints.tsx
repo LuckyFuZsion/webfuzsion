@@ -7,9 +7,6 @@ export function ResourceHints() {
       {/* If using a CDN, preconnect to it */}
       {process.env.NEXT_PUBLIC_CDN_URL && <link rel="preconnect" href={process.env.NEXT_PUBLIC_CDN_URL} />}
 
-      {/* Preload critical fonts */}
-      <link rel="preload" href="/fonts/BLANKA.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
-
       {/* Preload critical images */}
       <link rel="preload" href="/images/webfuzsion-logo-compressed.webp" as="image" type="image/webp" />
     </>

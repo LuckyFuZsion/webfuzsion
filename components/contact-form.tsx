@@ -1,7 +1,6 @@
 "use client"
 import { useState } from "react"
-import { useActionState } from "react"
-import { useFormStatus } from "react-dom"
+import { useFormState, useFormStatus } from "react-dom"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
 import { ArrowRight, CheckCircle, AlertCircle, RefreshCw } from "lucide-react"
@@ -50,8 +49,8 @@ export function ContactForm({ isMobile }: { isMobile: boolean }) {
   const [captchaInput, setCaptchaInput] = useState("")
   const [captchaError, setCaptchaError] = useState("")
 
-  // Form state using useActionState hook
-  const [state, formAction] = useActionState(submitContactForm, initialState)
+  // Form state using useFormState hook
+  const [state, formAction] = useFormState(submitContactForm, initialState)
 
   // Refresh CAPTCHA
   const refreshCaptcha = () => {

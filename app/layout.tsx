@@ -8,7 +8,6 @@ import { FloatingContactMenu } from "@/components/floating-contact-menu"
 import { WebDesignBusinessJsonLd, LocalBusinessJsonLd, WebsiteJsonLd, BreadcrumbJsonLd } from "@/components/json-ld"
 import { FAQSchema } from "@/components/faq-schema"
 import { ReviewJsonLd } from "@/components/json-ld"
-import Script from "next/script"
 import ConsentBanner from "@/components/consent-banner"
 import AnalyticsTracker from "@/components/analytics-tracker"
 import { Suspense } from "react"
@@ -98,8 +97,8 @@ export const metadata = {
   headers: {
     "Content-Security-Policy": `
   default-src 'self';
-  script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://analytics.ahrefs.com;
-  connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net https://analytics.ahrefs.com;
+  script-src 'self' 'unsafe-inline' https://analytics.ahrefs.com;
+  connect-src 'self' https://analytics.ahrefs.com;
   img-src 'self' data: https: blob:;
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   font-src 'self' https://fonts.gstatic.com;
@@ -125,89 +124,17 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         {/* Ahrefs analytics - direct script tag */}
-        <script src="https://analytics.ahrefs.com/analytics.js" data-key="1oXGkSDjbF9OcKwKfmfDgA" async />
-        {/* Google Consent Mode Setup - Must be before GA */}
-        <Script id="consent-mode-setup" strategy="beforeInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag() { dataLayer.push(arguments); }
-            
-            // Default consent to 'denied' for all
-            gtag('consent', 'default', {
-              'analytics_storage': 'denied',
-              'ad_storage': 'denied',
-              'personalization_storage': 'denied',
-              'functionality_storage': 'granted', // Necessary cookies always allowed
-              'security_storage': 'granted', // Security cookies always allowed
-              'wait_for_update': 500 // Wait for consent update
-            });
-          `}
-        </Script>
-
-        {/* Script to completely disable and remove Google Tag Assistant */}
-        <Script id="disable-tag-assistant" strategy="beforeInteractive">
-          {`
-            // Disable Google Tag Assistant
-            window['ga-disable-G-0LBYMRG5RQ'] = true;
-            
-            // Remove any Tag Assistant elements that might be present
-            document.addEventListener('DOMContentLoaded', function() {
-              // Remove any Tag Assistant elements
-              const removeTagAssistant = function() {
-                const tagAssistantElements = document.querySelectorAll('[id^="tag-assistant"], [class^="tag-assistant"], [id^="gtm-"], [class^="gtm-"]');
-                tagAssistantElements.forEach(function(element) {
-                  element.remove();
-                });
-                
-                // Also try to remove by common class names used by Tag Assistant
-                const possibleClasses = ['tagassistant', 'tag-assistant', 'gtm-debug', 'gtm-tag-assistant'];
-                possibleClasses.forEach(function(className) {
-                  const elements = document.getElementsByClassName(className);
-                  while(elements.length > 0) {
-                    elements[0].remove();
-                  }
-                });
-              };
-              
-              // Run immediately
-              removeTagAssistant();
-              
-              // Also run after a short delay to catch any dynamically added elements
-              setTimeout(removeTagAssistant, 1000);
-              setTimeout(removeTagAssistant, 3000);
-            });
-            
-            // Override any attempts to initialize Tag Assistant
-            window.tagassistant = { 
-              init: function() { return false; },
-              setup: function() { return false; },
-              start: function() { return false; }
-            };
-          `}
-        </Script>
-
-        {/* Google tag (gtag.js) */}
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-0LBYMRG5RQ" strategy="afterInteractive" async />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-0LBYMRG5RQ', {
-              send_page_view: false,
-              'allow_google_signals': true,
-              'allow_ad_personalization_signals': false,
-              'transport_type': 'beacon',
-              'anonymize_ip': true
-            });
-          `}
-        </Script>
+        <script 
+          src="https://analytics.ahrefs.com/analytics.js" 
+          data-key="1oXGkSDjbF9OcKwKfmfDgA" 
+          async 
+          defer
+        />
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="google-site-verification" content="SFv7PrQP_eyfyEcGTPqch6-g5Fez1Rmctky39RZQ4Ro" />
         <meta name="facebook-domain-verification" content="gd6neaagsk9l9tq4m473fulr56fozk" />
         <meta property="fb:app_id" content="1178547523595198" />
-        <link rel="preload" href="/fonts/BLANKA.otf" as="font" type="font/otf" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
 
@@ -248,7 +175,7 @@ export default function RootLayout({
         <meta httpEquiv="Pragma" content="no-cache" />
         <meta httpEquiv="Expires" content="0" />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <Suspense fallback={<div>Loading...</div>}>
             <PageTransition>{children}</PageTransition>

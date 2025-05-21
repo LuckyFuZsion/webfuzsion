@@ -39,12 +39,25 @@ const nextConfig = {
   // Disable unnecessary features
   poweredByHeader: false,
   
-  // HTTP/2 server push configuration
-  experimental: {
-    // Enable HTTP/2 server push for critical assets
-    // This is commented out as it's not fully supported in all Next.js versions
-    // http2ServerPush: true,
-  },
+  // Development-specific settings
+  ...(process.env.NODE_ENV === 'development' ? {
+    // Development settings
+    experimental: {
+      // Configure server actions
+      serverActions: {
+        allowedOrigins: ['localhost:3000'],
+        bodySizeLimit: '2mb'
+      }
+    }
+  } : {
+    // Production settings
+    experimental: {
+      // Production-only experimental features
+    }
+  }),
+
+  // Move serverComponentsExternalPackages to the root level
+  serverExternalPackages: [],
   
   // Remove all custom headers for now
   async headers() {
