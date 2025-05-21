@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react"
 import Image from "next/image"
-import { motion, AnimatePresence, type PanInfo } from "framer-motion"
+import type { PanInfo } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react"
 
@@ -44,143 +44,107 @@ export function PortfolioCardDeck({ items }: PortfolioCardDeckProps) {
     }
   }
 
-  // Calculate positions for the cards in the deck
-  const getCardStyle = (index: number) => {
-    const diff = (index - currentIndex + items.length) % items.length
-
-    // Create a stacked effect for the cards
-    if (diff === 0) {
-      return { zIndex: 10, scale: 1, opacity: 1, rotateY: 0, translateX: 0 }
-    } else if (diff === 1 || diff === items.length - 1) {
-      return {
-        zIndex: 9,
-        scale: 0.95,
-        opacity: 0.7,
-        rotateY: diff === 1 ? 5 : -5,
-        translateX: diff === 1 ? 20 : -20,
-      }
-    } else if (diff === 2 || diff === items.length - 2) {
-      return {
-        zIndex: 8,
-        scale: 0.9,
-        opacity: 0.4,
-        rotateY: diff === 2 ? 10 : -10,
-        translateX: diff === 2 ? 40 : -40,
-      }
-    } else {
-      return {
-        zIndex: 7,
-        scale: 0.85,
-        opacity: 0,
-        rotateY: diff === 3 ? 15 : -15,
-        translateX: diff === 3 ? 60 : -60,
-      }
-    }
-  }
-
   return (
-    <div className="relative w-full h-[500px] overflow-hidden" ref={constraintsRef}>
-      {/* Card Deck */}
-      <div className="absolute inset-0 flex items-center justify-center">
+    <div
+      className="relative w-full overflow-hidden rounded-xl p-6 bg-brand-dark/50 backdrop-blur-sm border border-white/10"
+      ref={constraintsRef}
+    >
+      <h3 className="text-2xl font-bold text-center text-white mb-2">Our Portfolio</h3>
+      <p className="text-gray-300 text-center mb-6">
+        Take a look at some of the websites we've designed and developed for our clients.
+      </p>
+
+      {/* Gallery Grid */}
+      <div className="grid grid-cols-2 gap-4 mb-8">
         {items.map((item, index) => {
-          const style = getCardStyle(index)
+          // Determine the site type for the ribbon
+          const siteType =
+            item.title === "Sharky's Bar"
+              ? "Business Site"
+              : item.title === "JammmySlots"
+                ? "Premium Site"
+                : "Starter Site"
+
+          const ribbonColor =
+            item.title === "Sharky's Bar"
+              ? "bg-blue-500"
+              : item.title === "JammmySlots"
+                ? "bg-purple-500"
+                : "bg-pink-500"
 
           return (
-            <AnimatePresence key={index} mode="wait">
-              <motion.div
-                className="absolute w-[280px] h-[400px] rounded-xl overflow-hidden shadow-lg bg-brand-dark/50 backdrop-blur-sm border border-white/10"
-                style={{
-                  zIndex: style.zIndex,
-                }}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{
-                  scale: style.scale,
-                  opacity: style.opacity,
-                  rotateY: style.rotateY,
-                  x: style.translateX,
-                  transition: { duration: 0.5, ease: "easeOut" },
-                }}
-                drag={index === currentIndex ? "x" : false}
-                dragConstraints={constraintsRef}
-                dragElastic={0.2}
-                onDragStart={() => setIsDragging(true)}
-                onDragEnd={handleDragEnd}
-                whileTap={{ cursor: "grabbing" }}
+            <div
+              key={index}
+              className={`relative rounded-lg overflow-hidden ${index === currentIndex ? "ring-2 ring-brand-pink" : ""}`}
+              onClick={() => setCurrentIndex(index)}
+            >
+              {/* Ribbon - repositioned to top */}
+              <div
+                className={`absolute top-0 left-0 right-0 z-10 ${ribbonColor} text-white py-1 text-sm font-bold text-center`}
               >
-                {/* Card Content */}
-                <div className="relative h-full w-full">
-                  {/* Image */}
-                  <div className="relative h-[60%] w-full">
-                    <Image
-                      src={item.imageUrl || "/placeholder.svg"}
-                      alt={item.title}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-brand-dark to-transparent opacity-70"></div>
-                  </div>
+                {siteType}
+              </div>
 
-                  {/* Content */}
-                  <div className="absolute bottom-0 left-0 right-0 p-5">
-                    <h3 className="text-xl font-bold text-white mb-1">{item.title}</h3>
-                    <p className="text-gray-300 mb-4">{item.type}</p>
-                    <a href={item.websiteUrl} target="_blank" rel="noopener noreferrer">
-                      <Button className="bg-brand-pink hover:bg-brand-pink/80 text-white">
-                        Visit Website <ExternalLink className="ml-2 h-4 w-4" />
-                      </Button>
-                    </a>
-                  </div>
-                </div>
-              </motion.div>
-            </AnimatePresence>
+              <div className="aspect-square relative">
+                <Image
+                  src="https://gxciioabwrkahdfe.public.blob.vercel-storage.com/logos/jammmy-xQgcWSmIIQC96FjnToLlxBTphURhnE.png"
+                  alt={item.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 50vw"
+                  priority={true}
+                  unoptimized={true}
+                  crossOrigin="anonymous"
+                />
+              </div>
+            </div>
           )
         })}
       </div>
 
-      {/* Navigation Controls */}
-      <div className="absolute bottom-4 left-0 right-0 flex justify-center items-center space-x-4 z-20">
-        <Button
-          onClick={goToPrevious}
-          variant="outline"
-          size="icon"
-          className="rounded-full border-white/20 bg-brand-dark/50 backdrop-blur-sm hover:bg-white/10 hover:border-brand-pink/30"
-        >
-          <ChevronLeft className="h-5 w-5" />
-          <span className="sr-only">Previous project</span>
-        </Button>
-
-        <div className="flex items-center space-x-2">
-          {items.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => {
-                setDirection(index > currentIndex ? 1 : -1)
-                setCurrentIndex(index)
-              }}
-              className={`w-2 h-2 rounded-full transition-all ${
-                index === currentIndex ? "bg-brand-pink w-4" : "bg-white/30 hover:bg-white/60"
-              }`}
-              aria-label={`Go to project ${index + 1}`}
-            />
-          ))}
-        </div>
-
-        <Button
-          onClick={goToNext}
-          variant="outline"
-          size="icon"
-          className="rounded-full border-white/20 bg-brand-dark/50 backdrop-blur-sm hover:bg-white/10 hover:border-brand-pink/30"
-        >
-          <ChevronRight className="h-5 w-5" />
-          <span className="sr-only">Next project</span>
-        </Button>
+      {/* Current Item Details */}
+      <div className="text-center mb-6">
+        <h4 className="text-xl font-bold text-white">{items[currentIndex].title}</h4>
+        <p className="text-gray-300 mb-4">{items[currentIndex].type}</p>
+        <a href={items[currentIndex].websiteUrl} target="_blank" rel="noopener noreferrer">
+          <Button className="bg-brand-pink hover:bg-brand-pink/80 text-white">
+            Visit Website <ExternalLink className="ml-2 h-4 w-4" />
+          </Button>
+        </a>
       </div>
 
-      {/* Instructions */}
-      <div className="absolute top-4 left-0 right-0 text-center text-white/70 text-sm">
-        <p>Swipe cards or use buttons to navigate</p>
+      {/* Navigation Dots */}
+      <div className="flex justify-center items-center space-x-2 mb-4">
+        {items.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => {
+              setDirection(index > currentIndex ? 1 : -1)
+              setCurrentIndex(index)
+            }}
+            className={`w-4 h-4 rounded-full transition-all ${
+              index === currentIndex ? "bg-brand-pink" : "bg-white/30 hover:bg-white/60"
+            }`}
+            aria-label={`Go to project ${index + 1}`}
+          />
+        ))}
       </div>
+
+      {/* Navigation Arrows */}
+      <button
+        onClick={goToPrevious}
+        className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full backdrop-blur-sm transition-colors"
+        aria-label="Previous project"
+      >
+        <ChevronLeft className="h-6 w-6" />
+      </button>
+      <button
+        onClick={goToNext}
+        className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full backdrop-blur-sm transition-colors"
+        aria-label="Next project"
+      >
+        <ChevronRight className="h-6 w-6" />
+      </button>
     </div>
   )
 }

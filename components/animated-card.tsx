@@ -1,17 +1,31 @@
 "use client"
 
 import type React from "react"
-
 import { motion } from "framer-motion"
+import { useMobile } from "@/hooks/use-mobile"
 
 interface AnimatedCardProps {
   children: React.ReactNode
   className?: string
   delay?: number
   index?: number
+  disableOnFastScroll?: boolean
 }
 
-export function AnimatedCard({ children, className, delay = 0, index = 0 }: AnimatedCardProps) {
+export function AnimatedCard({
+  children,
+  className,
+  delay = 0,
+  index = 0,
+  disableOnFastScroll = false,
+}: AnimatedCardProps) {
+  const { isMobile } = useMobile()
+
+  // If on mobile, render without animation
+  if (isMobile) {
+    return <div className={className}>{children}</div>
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}

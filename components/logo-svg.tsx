@@ -1,15 +1,19 @@
 import Image from "next/image"
 
-export function LogoSvg() {
+interface LogoSvgProps {
+  priority?: boolean
+}
+
+export function LogoSvg({ priority = false }: LogoSvgProps) {
   return (
-    <div className="relative h-8 w-auto">
+    <div className="custom-logo">
       <Image
-        src="/images/webfuzsion-logo.png"
+        src="/images/webfuzsion-logo-outline.png"
         alt="WebFuZsion"
-        width={240}
-        height={60}
-        className="h-full w-auto"
-        priority
+        width={180}
+        height={40}
+        className="h-8 md:h-10 w-auto"
+        priority={priority}
       />
     </div>
   )

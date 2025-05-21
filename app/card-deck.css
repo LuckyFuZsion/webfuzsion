@@ -4,12 +4,7 @@
 }
 
 .card-deck-card {
-  transform-style: preserve-3d;
   transition: transform 0.5s ease-out;
-}
-
-.card-deck-card:hover {
-  transform: translateZ(20px);
 }
 
 .card-deck-shadow {
@@ -26,11 +21,6 @@
   transition: all 0.5s ease-out;
 }
 
-.card-deck-card:hover .card-deck-shadow {
-  transform: scaleX(0.7) translateY(5px);
-  opacity: 0.8;
-}
-
 .card-deck-instruction {
   animation: pulse 2s infinite;
 }
@@ -44,5 +34,16 @@
   }
   100% {
     opacity: 0.5;
+  }
+}
+
+/* Fallback styles for mobile */
+@media (max-width: 767px) {
+  .card-deck-container {
+    perspective: none;
+  }
+
+  .card-deck-card {
+    transform-style: flat !important;
   }
 }

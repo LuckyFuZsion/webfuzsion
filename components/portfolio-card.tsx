@@ -13,22 +13,38 @@ interface PortfolioCardProps {
 }
 
 export function PortfolioCard({ title, type, imageUrl, websiteUrl }: PortfolioCardProps) {
+  // Determine the site type for the ribbon
+  const siteType =
+    title === "Sharky's Bar" ? "Business Site" : title === "JammmySlots" ? "Premium Site" : "Starter Site"
+
+  const ribbonColor =
+    title === "Sharky's Bar" ? "bg-blue-500" : title === "JammmySlots" ? "bg-purple-500" : "bg-pink-500"
+
   return (
     <motion.div
       className="group relative overflow-hidden rounded-xl cursor-card"
       whileHover={{ y: -5 }}
       transition={{ duration: 0.3 }}
     >
+      {/* Ribbon - repositioned to top */}
+      <div
+        className={`absolute top-0 left-0 right-0 z-10 ${ribbonColor} text-white py-1 px-3 text-sm font-bold text-center`}
+      >
+        {siteType}
+      </div>
+
       {/* Image */}
       <div className="aspect-square relative overflow-hidden">
         <motion.div whileHover={{ scale: 1.1 }} transition={{ duration: 0.5 }} className="h-full w-full">
           <Image
-            src={imageUrl || "/placeholder.svg"}
+            src="https://gxciioabwrkahdfe.public.blob.vercel-storage.com/logos/jammmy-xQgcWSmIIQC96FjnToLlxBTphURhnE.png"
             alt={title}
             fill
             className="object-cover"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            priority={title === "Sharky's Bar" || title === "The Painted Gardener"}
+            priority={true}
+            unoptimized={true}
+            crossOrigin="anonymous"
           />
         </motion.div>
         <div className="absolute inset-0 bg-gradient-to-t from-brand-dark to-transparent opacity-80 group-hover:opacity-70 transition-opacity duration-300"></div>

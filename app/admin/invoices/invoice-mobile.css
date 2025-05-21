@@ -1,0 +1,128 @@
+/* Mobile styles for invoice section */
+@media (max-width: 768px) {
+  .invoice-form .form-row {
+    flex-direction: column;
+  }
+
+  .invoice-form .form-group {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+
+  .invoice-form .line-items-table {
+    overflow-x: auto;
+  }
+
+  .invoice-form .invoice-totals {
+    justify-content: center;
+  }
+
+  .invoice-form .invoice-totals > div {
+    width: 100%;
+  }
+
+  /* Status dropdown positioning for mobile */
+  .status-dropdown-container {
+    position: static;
+  }
+
+  .status-dropdown {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Improve touch targets for mobile */
+  .dropdown-item {
+    padding: 12px 16px !important;
+    min-height: 44px;
+  }
+
+  /* Fix for dropdowns on mobile */
+  [data-dropdown="action"],
+  [data-dropdown="status"] {
+    position: relative;
+    z-index: 10;
+  }
+
+  /* Ensure dropdowns are above other elements */
+  .dropdown-open .dropdown-item {
+    position: relative;
+    z-index: 9999;
+  }
+
+  /* Make buttons more tappable */
+  button,
+  a {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Fix for edit button specifically */
+  button[title="Edit Invoice"],
+  .dropdown-item:has(.h-4.w-4.mr-2.text-orange-500) {
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  }
+
+  /* Ensure dropdowns are visible and interactive */
+  .absolute {
+    position: fixed;
+    z-index: 9999;
+  }
+
+  /* Prevent scrolling when dropdown is open */
+  body.dropdown-open {
+    overflow: hidden;
+  }
+
+  /* Make dropdown items easier to tap */
+  .dropdown-item {
+    padding: 12px 16px;
+  }
+}
+
+/* Fix for status dropdown buttons */
+button[data-dropdown="status"],
+button[data-dropdown="action"] {
+  position: relative;
+  z-index: 10;
+}
+
+/* Ensure dropdown menus are above other content */
+.absolute.z-10 {
+  z-index: 50;
+}
+
+/* Dropdown positioning fixes */
+.relative {
+  position: relative;
+}
+
+/* Ensure dropdowns are visible on top of all other elements */
+div[role="menu"],
+.status-dropdown,
+.action-dropdown {
+  z-index: 9999 !important;
+}
+
+/* Fix for dropdown menus */
+.absolute.z-50 {
+  z-index: 9999 !important;
+  position: absolute;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Ensure dropdown containers don't get clipped */
+td .relative,
+.relative {
+  overflow: visible !important;
+}

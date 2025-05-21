@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invoice from WebFuZsion</title>
+  <style>
+    /* Base styles - using email-safe approaches */
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      color: #333333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      background: linear-gradient(135deg, #4a6cf7 0%, #2c3e9c 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    .logo-container {
+      display: inline-block;
+      background-color: white;
+      border-radius: 50%;
+      padding: 10px;
+      margin-bottom: 15px;
+    }
+    .logo {
+      width: 80px;
+      height: auto;
+    }
+    .invoice-title {
+      font-size: 28px;
+      font-weight: bold;
+      margin: 0;
+      padding: 0;
+    }
+    .invoice-subtitle {
+      font-size: 16px;
+      opacity: 0.9;
+      margin-top: 5px;
+    }
+    .content {
+      padding: 30px;
+    }
+    .invoice-details {
+      background-color: #f9f9f9;
+      border-left: 4px solid #4a6cf7;
+      padding: 15px;
+      margin-bottom: 25px;
+      border-radius: 0 4px 4px 0;
+    }
+    .invoice-details p {
+      margin: 5px 0;
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    .section-title {
+      color: #4a6cf7;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+      font-size: 18px;
+    }
+    .two-columns {
+      display: table;
+      width: 100%;
+    }
+    .column {
+      display: table-cell;
+      width: 50%;
+      vertical-align: top;
+    }
+    table.items {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+    table.items th {
+      background-color: #4a6cf7;
+      color: white;
+      text-align: left;
+      padding: 12px 15px;
+    }
+    table.items td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+    }
+    table.items tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    .totals {
+      background-color: #f9f9f9;
+      border: 1px solid #eee;
+      border-left: 4px solid #4a6cf7;
+      border-radius: 0 4px 4px 0;
+      padding: 15px;
+      margin-left: auto;
+      width: 250px;
+    }
+    .totals-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+    }
+    .totals-row.total {
+      font-weight: bold;
+      font-size: 18px;
+      border-top: 2px solid #ddd;
+      padding-top: 10px;
+      margin-top: 5px;
+      color: #4a6cf7;
+    }
+    .discount {
+      color: #e74c3c;
+    }
+    .notes-section {
+      background-color: #f9f9f9;
+      border-left: 4px solid #f39c12;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 0 4px 4px 0;
+    }
+    .terms-section {
+      background-color: #f9f9f9;
+      border-left: 4px solid #2ecc71;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 0 4px 4px 0;
+    }
+    .footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #f9f9f9;
+      color: #777;
+      border-top: 1px solid #eee;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 15px;
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-top: 10px;
+    }
+    .status-draft {
+      background-color: #95a5a6;
+      color: white;
+    }
+    .status-sent {
+      background-color: #f39c12;
+      color: white;
+    }
+    .status-paid {
+      background-color: #2ecc71;
+      color: white;
+    }
+    .status-overdue {
+      background-color: #e74c3c;
+      color: white;
+    }
+    .payment-info {
+      background-color: #e8f4fd;
+      border-left: 4px solid #3498db;
+      padding: 15px;
+      margin-top: 30px;
+      border-radius: 0 4px 4px 0;
+    }
+    /* Responsive adjustments */
+    @media only screen and (max-width: 600px) {
+      .column {
+        display: block;
+        width: 100%;
+      }
+      .totals {
+        width: auto;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo-container">
+        <img src="https://webfuzsion.com/images/webfuzsion-logo.png" alt="WebFuZsion Logo" class="logo">
+      </div>
+      <h1 class="invoice-title">INVOICE</h1>
+      <p class="invoice-subtitle">Thank you for your business</p>
+      <div class="status-badge status-sent">Sent</div>
+    </div>
+    
+    <div class="content">
+      <div class="invoice-details">
+        <p><strong>Invoice Number:</strong> {{invoice_number}}</p>
+        <p><strong>Date:</strong> {{issue_date}}</p>
+        <p><strong>Due Date:</strong> {{due_date}}</p>
+        <p><strong>Project:</strong> {{project_name}}</p>
+      </div>
+
+      <div class="two-columns section">
+        <div class="column">
+          <h2 class="section-title">From</h2>
+          <p>
+            <strong>WebFuZsion</strong><br>
+            Steven Platts<br>
+            Grantham, UK<br>
+            info.webfuzsion@gmail.com
+          </p>
+        </div>
+        <div class="column">
+          <h2 class="section-title">Bill To</h2>
+          <p>
+            <strong>{{customer_name}}</strong><br>
+            {{customer_email}}<br>
+            {{customer_phone}}<br>
+            {{customer_address}}<br>
+            {{customer_city}} {{customer_postal_code}}<br>
+            {{customer_country}}
+          </p>
+        </div>
+      </div>
+
+      <h2 class="section-title">Invoice Items</h2>
+      <table class="items">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th>Discount</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each items}}
+          <tr>
+            <td>{{description}}</td>
+            <td>{{quantity}}</td>
+            <td>£{{unit_price}}</td>
+            <td>
+              {{#if discount_percentage}}
+                {{discount_percentage}}% (£{{discount_amount}})
+              {{else}}
+                -
+              {{/if}}
+            </td>
+            <td>£{{amount}}</td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+
+      <div class="totals">
+        <div class="totals-row">
+          <span>Original Subtotal:</span>
+          <span>£{{original_subtotal}}</span>
+        </div>
+        {{#if total_item_discounts}}
+        <div class="totals-row">
+          <span>Item Discounts:</span>
+          <span class="discount">-£{{total_item_discounts}}</span>
+        </div>
+        {{/if}}
+        <div class="totals-row">
+          <span>Subtotal:</span>
+          <span>£{{subtotal}}</span>
+        </div>
+        {{#if discount_amount}}
+        <div class="totals-row">
+          <span>Additional Discount:</span>
+          <span class="discount">-£{{discount_amount}}</span>
+        </div>
+        {{/if}}
+        <div class="totals-row total">
+          <span>Total:</span>
+          <span>£{{total_amount}}</span>
+        </div>
+        {{#if total_discount}}
+        <div class="totals-row">
+          <span>Total Savings:</span>
+          <span class="discount">£{{total_discount}} ({{discount_percentage}}%)</span>
+        </div>
+        {{/if}}
+      </div>
+
+      {{#if notes}}
+      <div class="notes-section">
+        <h3>Notes</h3>
+        <p>{{notes}}</p>
+      </div>
+      {{/if}}
+
+      {{#if terms}}
+      <div class="terms-section">
+        <h3>Terms & Conditions</h3>
+        <p>{{terms}}</p>
+      </div>
+      {{/if}}
+
+      <div class="payment-info">
+        <h3>Payment Information</h3>
+        <p>Please make payment to:</p>
+        <p><strong>Steven Platts</strong> • Sort Code: 110333 • Account: 00577966</p>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Thank you for your business!</p>
+      <p>© 2024 WebFuZsion. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>

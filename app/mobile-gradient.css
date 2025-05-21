@@ -1,0 +1,99 @@
+/* Mobile Gradient Background System */
+
+/* Main container gradient for mobile */
+.mobile-gradient-background {
+  background: linear-gradient(180deg, var(--brand-dark) 0%, var(--brand-dark) 5%);
+  position: relative;
+}
+
+.mobile-gradient-background::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    180deg,
+    var(--brand-dark) 0%,
+    var(--brand-purple) 15%,
+    var(--brand-pink) 30%,
+    var(--brand-blue) 45%,
+    var(--brand-orange) 60%,
+    var(--brand-purple) 75%,
+    var(--brand-dark) 90%
+  );
+  opacity: 0.2;
+  z-index: -2;
+  pointer-events: none;
+}
+
+/* Section-specific gradient overlays */
+.section-anchor {
+  position: relative;
+  z-index: 1;
+}
+
+.section-anchor::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  opacity: 0.7;
+  background: transparent;
+}
+
+/* Section-specific gradient colors */
+.section-anchor[data-section-color="dark-purple"]::before {
+  background: linear-gradient(180deg, rgba(10, 10, 20, 0.9) 0%, rgba(102, 0, 204, 0.5) 100%);
+}
+
+.section-anchor[data-section-color="purple-pink"]::before {
+  background: linear-gradient(180deg, rgba(102, 0, 204, 0.5) 0%, rgba(255, 0, 153, 0.5) 100%);
+}
+
+.section-anchor[data-section-color="pink-blue"]::before {
+  background: linear-gradient(180deg, rgba(255, 0, 153, 0.5) 0%, rgba(0, 178, 255, 0.5) 100%);
+}
+
+.section-anchor[data-section-color="blue-orange"]::before {
+  background: linear-gradient(180deg, rgba(0, 178, 255, 0.5) 0%, rgba(255, 122, 0, 0.5) 100%);
+}
+
+.section-anchor[data-section-color="orange-purple"]::before {
+  background: linear-gradient(180deg, rgba(255, 122, 0, 0.5) 0%, rgba(102, 0, 204, 0.5) 100%);
+}
+
+.section-anchor[data-section-color="purple-dark"]::before {
+  background: linear-gradient(180deg, rgba(102, 0, 204, 0.5) 0%, rgba(10, 10, 20, 0.9) 100%);
+}
+
+/* Smooth gradient transitions between sections */
+.section-anchor::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 150px;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.section-anchor::after {
+  bottom: -75px;
+  background: inherit;
+  filter: blur(30px);
+}
+
+/* Define CSS variables for brand colors */
+:root {
+  --brand-dark: #0a0a14;
+  --brand-blue: #00b2ff;
+  --brand-orange: #ff7a00;
+  --brand-pink: #ff0099;
+  --brand-purple: #6600cc;
+}

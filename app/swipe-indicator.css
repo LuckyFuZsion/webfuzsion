@@ -1,0 +1,47 @@
+/* Swipe indicator animation */
+@keyframes swipeHint {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  25% {
+    opacity: 1;
+    transform: translateX(-10px);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(10px);
+  }
+  75% {
+    opacity: 1;
+    transform: translateX(-10px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+}
+
+.swipe-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 10px 20px;
+  border-radius: 20px;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 10;
+}
+
+.swipe-hint-visible {
+  animation: swipeHint 2s ease-in-out;
+}
+
+/* Add touch-action manipulation to improve touch handling */
+.touch-swipe {
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}

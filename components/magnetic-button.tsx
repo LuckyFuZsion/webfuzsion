@@ -18,6 +18,9 @@ export function MagneticButton({ children, className = "", strength = 40 }: Magn
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!ref.current) return
 
+    // Skip the magnetic effect on mobile devices
+    if (typeof window !== "undefined" && window.innerWidth < 768) return
+
     const { clientX, clientY } = e
     const { left, top, width, height } = ref.current.getBoundingClientRect()
 
