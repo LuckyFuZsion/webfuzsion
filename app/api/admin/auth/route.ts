@@ -27,16 +27,17 @@ export async function POST(request: NextRequest) {
 
     // Check credentials against environment variables
     if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
-      // Set authentication cookie
-      cookies().set({
-        name: "admin-auth",
-        value: "authenticated",
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 60 * 60 * 24, // 1 day
-        path: "/",
-      })
+      // Set authentication cookie (using await)
+      const cookieStore = await cookies();
+      cookieStore.set({
+         name: "admin-auth",
+         value: "authenticated",
+         httpOnly: true,
+         secure: process.env.NODE_ENV === "production",
+         sameSite: "strict",
+         maxAge: 60 * 60 * 24, // 1 day
+         path: "/",
+      });
 
       return NextResponse.json({ success: true })
     }
