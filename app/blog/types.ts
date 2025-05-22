@@ -9,4 +9,4 @@ export interface BlogPost {
   tags: string[]
   readingTime: string
   category: string
-} 
+}

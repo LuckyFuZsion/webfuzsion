@@ -51,4 +51,4 @@ export async function sendEmail(options: EmailOptions): Promise<EmailResult> {
       error: "Failed to send email",
     }
   }
-} 
+}

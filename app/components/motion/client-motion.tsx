@@ -12,4 +12,4 @@ export function ClientMotionH1(props: ComponentProps<typeof motion.h1>) {
   return <motion.h1 {...props} />
 }
 
-// Add more motion components as needed 
+// Add more motion components as needed

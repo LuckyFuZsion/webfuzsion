@@ -46,4 +46,4 @@ export function AnimatedFeatures() {
       </div>
     </section>
   )
-} 
+}

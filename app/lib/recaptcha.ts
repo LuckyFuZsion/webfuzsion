@@ -42,4 +42,4 @@ export async function verifyRecaptchaToken(token: string): Promise<RecaptchaResp
       error: "Failed to verify reCAPTCHA",
     }
   }
-} 
+}

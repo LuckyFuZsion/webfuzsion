@@ -24,4 +24,4 @@ export function AnimatedNotFound() {
       </Link>
     </motion.div>
   )
-} 
+}

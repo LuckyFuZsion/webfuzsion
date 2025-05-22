@@ -2,44 +2,35 @@
 
 import { useState, useEffect } from "react"
 
+const MOBILE_BREAKPOINT = 768
+
 export function useMobile() {
-  // Default to non-mobile to ensure content renders initially
-  const [isMobile, setIsMobile] = useState(false)
-  const [isClient, setIsClient] = useState(false)
-  // Add a flag for enabling animations on mobile
-  const [enableMobileAnimations, setEnableMobileAnimations] = useState(true)
-  // Add a preloaded state
+  // Initialize with undefined to prevent hydration mismatch
+  const [isMobile, setIsMobile] = useState<boolean | undefined>(undefined)
   const [isPreloaded, setIsPreloaded] = useState(false)
 
   useEffect(() => {
-    // Mark that we're on the client
-    setIsClient(true)
-
-    // Check if the device is mobile
+    // Function to check if the device is mobile based on screen width
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
     }
 
-    // Initial check
+    // Check on initial load
     checkMobile()
 
-    // Mark as preloaded after a short delay
-    setTimeout(() => {
-      setIsPreloaded(true)
-    }, 100)
+    // Mark as preloaded
+    setIsPreloaded(true)
 
-    // Listen for resize events
+    // Add event listener for window resize
     window.addEventListener("resize", checkMobile)
 
-    return () => {
-      window.removeEventListener("resize", checkMobile)
-    }
+    // Clean up event listener
+    return () => window.removeEventListener("resize", checkMobile)
   }, [])
 
-  // Function to fully enable all animations
-  const enableAllAnimations = () => {
-    setEnableMobileAnimations(true)
-  }
-
-  return { isMobile, isClient, enableMobileAnimations, enableAllAnimations, isPreloaded }
+  // Return isMobile (defaulting to false if undefined) and isPreloaded
+  return { isMobile: !!isMobile, isPreloaded }
 }
+
+// Also export as default for flexibility
+export default useMobile

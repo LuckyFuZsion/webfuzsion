@@ -69,4 +69,4 @@ export function AnimatedContact() {
       </div>
     </section>
   )
-} 
+}

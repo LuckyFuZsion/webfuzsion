@@ -60,4 +60,4 @@ export function AnimatedHero() {
       </motion.div>
     </section>
   )
-} 
+}

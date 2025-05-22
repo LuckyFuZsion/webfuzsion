@@ -48,4 +48,4 @@ export function AnimatedTestimonials() {
       </div>
     </section>
   )
-} 
+}

@@ -25,4 +25,4 @@ export default function NotFound() {
       <Footer />
     </div>
   )
-} 
+}

@@ -17,4 +17,4 @@ export const initialState: FormState = {
   success: false,
   message: "",
   errors: {},
-} 
+}
