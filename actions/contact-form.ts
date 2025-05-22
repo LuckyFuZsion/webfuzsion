@@ -3,7 +3,7 @@
 import { z } from "zod"
 import nodemailer from "nodemailer"
 import { getGmailConfig, getEmailAddresses } from "@/lib/gmail-config"
-import { type FormState, type FormErrors } from "@/lib/form-types"
+import type { FormState, FormErrors } from "@/lib/form-types"
 
 // Define validation schema
 const FormSchema = z.object({
@@ -17,7 +17,7 @@ const FormSchema = z.object({
 function formatZodErrors(error: z.ZodError): FormErrors {
   const formattedErrors: FormErrors = {}
   const fieldErrors = error.format()
-  
+
   Object.entries(fieldErrors).forEach(([key, value]) => {
     if (key !== "_errors" && typeof value === "object" && value !== null) {
       const fieldValue = value as { _errors?: string[] }
@@ -27,7 +27,7 @@ function formatZodErrors(error: z.ZodError): FormErrors {
       }
     }
   })
-  
+
   return formattedErrors
 }
 
@@ -70,6 +70,8 @@ export async function submitContactForm(prevState: FormState, formData: FormData
       }
     }
 
+    console.log("Gmail config retrieved successfully")
+
     const emailAddresses = getEmailAddresses()
     if (!emailAddresses) {
       console.error("Email addresses configuration is missing")
@@ -80,11 +82,15 @@ export async function submitContactForm(prevState: FormState, formData: FormData
       }
     }
 
+    console.log("Email addresses retrieved successfully")
+
     // If there's a hardcoded recipient email, update it
     const recipientEmail = process.env.EMAIL_TO || "info.webfuzsion@gmail.com"
+    console.log("Recipient email:", recipientEmail)
 
     // Create email transporter with Gmail
     const transporter = nodemailer.createTransport(gmailConfig)
+    console.log("Transporter created successfully")
 
     // Email content
     const mailOptions = {
@@ -104,8 +110,20 @@ export async function submitContactForm(prevState: FormState, formData: FormData
       replyTo: email, // Allow replying directly to the sender
     }
 
+    console.log("Attempting to send email with options:", {
+      from: mailOptions.from,
+      to: mailOptions.to,
+      subject: mailOptions.subject,
+    })
+
     // Send email
-    await transporter.sendMail(mailOptions)
+    try {
+      const info = await transporter.sendMail(mailOptions)
+      console.log("Email sent successfully:", info)
+    } catch (emailError) {
+      console.error("Error sending email:", emailError)
+      throw emailError
+    }
 
     return {
       success: true,

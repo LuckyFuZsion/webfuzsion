@@ -40,7 +40,23 @@ export default function AdminLogin() {
         body: JSON.stringify({ username, password }),
       })
 
-      const data = await response.json()
+      // Log the raw response for debugging
+      const responseText = await response.text()
+      console.log("Raw response:", responseText)
+
+      let data
+      try {
+        // Try to parse the response as JSON
+        data = JSON.parse(responseText)
+      } catch (parseError) {
+        console.error("Error parsing response:", parseError)
+        setError(
+          `Server returned invalid response: ${responseText.substring(0, 100)}${responseText.length > 100 ? "..." : ""}`,
+        )
+        setDebugInfo(`Status: ${response.status}, Response parsing error: ${parseError}`)
+        setIsLoading(false)
+        return
+      }
 
       if (response.ok && data.success) {
         // Add a small delay to ensure cookie is set

@@ -1,24 +1,40 @@
-// Gmail SMTP configuration helper
-export const getGmailConfig = () => {
+export function getGmailConfig() {
+  // Check if required environment variables are set
+  const user = process.env.GMAIL_USER
+  const password = process.env.GMAIL_APP_PASSWORD
+
+  console.log("Gmail config check - User exists:", !!user)
+  console.log("Gmail config check - Password exists:", !!password)
+
+  if (!user || !password) {
+    console.error("Gmail credentials missing. Please set GMAIL_USER and GMAIL_APP_PASSWORD environment variables.")
+    return null
+  }
+
   return {
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // true for 465, false for other ports
+    service: "gmail",
     auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_APP_PASSWORD, // This must be an App Password, not your regular Gmail password
-    },
-    tls: {
-      rejectUnauthorized: true,
+      user,
+      pass: password,
     },
   }
 }
 
-// Helper to get standardized email addresses
-export const getEmailAddresses = () => {
+export function getEmailAddresses() {
+  const from = process.env.EMAIL_FROM
+  const to = process.env.EMAIL_TO
+
+  console.log("Email addresses check - From exists:", !!from)
+  console.log("Email addresses check - To exists:", !!to)
+
+  if (!from) {
+    console.error("Email FROM address missing. Please set EMAIL_FROM environment variable.")
+    return null
+  }
+
   return {
-    from: `"WebFuZsion" <${process.env.GMAIL_USER || "info.webfuzsion@gmail.com"}>`,
-    to: process.env.GMAIL_USER || "info.webfuzsion@gmail.com",
-    cc: ["stevenplatts50@aol.com"],
+    from,
+    to,
+    cc: process.env.EMAIL_CC,
   }
 }
