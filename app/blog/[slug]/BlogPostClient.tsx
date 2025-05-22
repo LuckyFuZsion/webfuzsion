@@ -3,11 +3,20 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { ArrowLeft } from "lucide-react"
-import { ClientMotionDiv, ClientMotionH1 } from "@/components/client-motion"
+import { ClientMotionDiv, ClientMotionH1 } from "../../components/motion/client-motion"
 import Link from "next/link"
 import Image from "next/image"
 import { useEffect } from "react"
 import { BlogSocialShare } from "@/components/blog-social-share"
+import { useState } from "react"
+import { motion } from "framer-motion"
+import { useInView } from "framer-motion"
+import { useRef } from "react"
+import { useRouter } from "next/navigation"
+import { BlogPost } from "../types"
+import { formatDate } from "../utils"
+import { useTheme } from "next-themes"
+import { cn } from "@/lib/utils"
 
 interface BlogPost {
   title: string

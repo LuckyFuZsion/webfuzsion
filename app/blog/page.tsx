@@ -5,9 +5,17 @@ import { Footer } from "@/components/footer"
 import { ArrowRight } from "lucide-react"
 import { TextReveal } from "@/components/text-reveal"
 import { AnimatedSection } from "@/components/animated-section"
-import { ClientMotionDiv } from "@/components/client-motion"
+import { ClientMotionDiv } from "../components/motion/client-motion"
 import Link from "next/link"
 import Image from "next/image"
+import { BlogPost } from "./types"
+import { formatDate } from "./utils"
+import { useTheme } from "next-themes"
+import { cn } from "@/lib/utils"
+import { motion } from "framer-motion"
+import { useInView } from "framer-motion"
+import { useRef } from "react"
+import { BlogSocialShare } from "@/components/blog-social-share"
 
 interface BlogPost {
   slug: string
