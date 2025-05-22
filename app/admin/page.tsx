@@ -1,74 +1,86 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import React, { useState, useEffect, Suspense } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import dynamic from "next/dynamic"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { AdminHeader } from "./components/admin-header"
 import { AdminCard } from "./components/admin-card"
 import { FileText, Users, Settings, BarChart, FileCode, Calendar, ImageIcon } from "lucide-react"
+import { V0EnvironmentNotice } from "./components/v0-environment-notice"
 
-export default function AdminPage() {
-  const [isLoading, setIsLoading] = useState(true)
+// Loading component
+const LoadingSpinner = () => (
+  <div className="min-h-screen bg-brand-dark text-white flex items-center justify-center">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-pink"></div>
+  </div>
+)
+
+// Error component
+const ErrorDisplay = ({ message }: { message: string }) => (
+  <div className="min-h-screen bg-brand-dark text-white flex items-center justify-center">
+    <div className="text-xl text-red-400">{message}</div>
+  </div>
+)
+
+// Main admin dashboard component
+const AdminDashboard = () => {
   const [isV0, setIsV0] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
   const router = useRouter()
 
   useEffect(() => {
-    // Check if we're in v0 environment
-    const checkV0 = () => {
-      const isV0Environment =
-        typeof window !== "undefined" &&
-        (window.location.hostname.includes("v0.dev") ||
-          document.referrer.includes("v0.dev") ||
-          navigator.userAgent.includes("Vercel") ||
-          window.location.href.includes("vercel.app"))
-
-      setIsV0(isV0Environment)
-
-      // In v0, skip auth check
-      if (isV0Environment) {
-        setIsLoading(false)
-        return true
-      }
-      return false
-    }
-
-    // Only check auth if not in v0
-    const checkAuth = async () => {
-      if (checkV0()) return
-
+    const checkEnvironment = async () => {
       try {
-        const res = await fetch("/api/admin/check-auth")
+        // Check if we're in v0 environment
+        const isV0Environment =
+          typeof window !== "undefined" &&
+          (window.location.hostname.includes("v0.dev") ||
+            document.referrer.includes("v0.dev") ||
+            navigator.userAgent.includes("Vercel") ||
+            window.location.href.includes("vercel.app") ||
+            window.location.search.includes("v0_bypass=true"))
+
+        if (isV0Environment) {
+          setIsV0(true)
+          setIsLoading(false)
+          return
+        }
+
+        // Only check auth if not in v0
+        const res = await fetch("/api/admin/check-auth", {
+          credentials: "include",
+          cache: "no-store",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+
         if (!res.ok) {
           router.push("/admin/login")
+          return
         }
+
+        setIsLoading(false)
       } catch (err) {
         console.error("Authentication check failed:", err)
-        setError("Failed to check authentication. Please try again.")
-      } finally {
+        setError(err instanceof Error ? err : new Error("Failed to check authentication"))
         setIsLoading(false)
       }
     }
 
-    checkAuth()
+    checkEnvironment()
   }, [router])
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-brand-dark text-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-pink"></div>
-      </div>
-    )
+    return <LoadingSpinner />
   }
 
   if (error) {
-    return (
-      <div className="min-h-screen bg-brand-dark text-white flex items-center justify-center">
-        <div className="text-xl text-red-400">{error}</div>
-      </div>
-    )
+    return <ErrorDisplay message={error.message} />
   }
 
   return (
@@ -77,13 +89,7 @@ export default function AdminPage() {
       <div className="container mx-auto px-4 py-20">
         <div className="bg-brand-dark/50 backdrop-blur-sm border border-white/10 rounded-xl p-4 md:p-8">
           <AdminHeader />
-
-          {isV0 && (
-            <div className="bg-amber-500/20 border border-amber-500/50 text-amber-200 p-3 rounded-lg mb-4 text-sm">
-              <strong>v0 Environment Detected:</strong> You are viewing this admin area in the v0 preview environment.
-              Authentication has been bypassed for testing purposes.
-            </div>
-          )}
+          {isV0 && <V0EnvironmentNotice />}
 
           <div className="mb-8">
             <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
@@ -166,4 +172,46 @@ export default function AdminPage() {
       <Footer />
     </div>
   )
+}
+
+// Dynamically import the dashboard with no SSR
+const DynamicAdminDashboard = dynamic(() => Promise.resolve(AdminDashboard), {
+  ssr: false,
+  loading: () => <LoadingSpinner />
+})
+
+// Main page component
+export default function AdminPage() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <DynamicAdminDashboard />
+    </Suspense>
+  )
+}
+
+// Simple error boundary component
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode; onError: (error: Error) => void },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode; onError: (error: Error) => void }) {
+    super(props)
+    this.state = { hasError: false }
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true }
+  }
+
+  componentDidCatch(error: Error) {
+    this.props.onError(error)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <ErrorDisplay message="Something went wrong. Please try again." />
+    }
+
+    return this.props.children
+  }
 }

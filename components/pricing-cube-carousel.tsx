@@ -6,21 +6,19 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, Check } from "lucide-react"
 
-interface PricingPlan {
-  title: string
-  price: string
-  earlyBirdPrice?: string
-  description: string
-  features: string[]
-  isPopular?: boolean
-  gradient: string
-}
-
 interface PricingCubeCarouselProps {
-  plans: PricingPlan[]
+  plans: Array<{
+    title: string
+    price: string
+    earlyBirdPrice?: string
+    description: string
+    features: string[]
+    isPopular?: boolean
+    gradient: string
+  }>
 }
 
-export function PricingCubeCarousel({ plans }: PricingCubeCarouselProps) {
+export default function PricingCubeCarousel({ plans }: PricingCubeCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isRotating, setIsRotating] = useState(false)
   const [touchStart, setTouchStart] = useState<number | null>(null)

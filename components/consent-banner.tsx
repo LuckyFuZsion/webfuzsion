@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { setCookie, getCookie } from "cookies-next"
+import Cookies from "js-cookie"
 
 type ConsentPreferences = {
   analytics: boolean
@@ -20,7 +20,7 @@ export default function ConsentBanner() {
 
   useEffect(() => {
     // Check if consent has already been given
-    const consentCookie = getCookie("cookie-consent")
+    const consentCookie = Cookies.get("cookie-consent")
     if (!consentCookie) {
       // Wait a moment before showing the banner for better UX
       const timer = setTimeout(() => {
@@ -30,7 +30,7 @@ export default function ConsentBanner() {
     } else {
       // If consent exists, parse it
       try {
-        const savedPreferences = JSON.parse(consentCookie as string) as ConsentPreferences
+        const savedPreferences = JSON.parse(consentCookie) as ConsentPreferences
         setPreferences(savedPreferences)
 
         // Update Google's consent mode with saved preferences
@@ -63,81 +63,31 @@ export default function ConsentBanner() {
     saveConsent(preferences)
   }
 
-  const saveConsent = (consentPreferences: ConsentPreferences) => {
-    // Save to cookie (30 days expiry)
-    setCookie("cookie-consent", JSON.stringify(consentPreferences), {
-      maxAge: 30 * 24 * 60 * 60,
-      path: "/",
+  const saveConsent = (preferences: ConsentPreferences) => {
+    Cookies.set("consent-preferences", JSON.stringify(preferences), {
+      expires: 365,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production"
     })
-
-    // Update Google's consent mode
-    updateConsentState(consentPreferences)
-
-    // Hide the banner
     setShowBanner(false)
-    setShowPreferences(false)
 
     // Dispatch a custom event that Google Analytics was updated
     if (typeof window !== "undefined") {
       const event = new CustomEvent("consentUpdated", {
-        detail: consentPreferences,
+        detail: preferences,
       })
       document.dispatchEvent(event)
     }
   }
 
   const updateConsentState = (consentPreferences: ConsentPreferences) => {
-    // Update Google's consent mode
-    if (typeof window !== "undefined" && window.gtag) {
-      try {
-        window.gtag("consent", "update", {
-          analytics_storage: consentPreferences.analytics ? "granted" : "denied",
-          ad_storage: consentPreferences.marketing ? "granted" : "denied",
-          personalization_storage: consentPreferences.personalization ? "granted" : "denied",
-        })
-
-        console.log("Consent updated:", {
-          analytics_storage: consentPreferences.analytics ? "granted" : "denied",
-          ad_storage: consentPreferences.marketing ? "granted" : "denied",
-          personalization_storage: consentPreferences.personalization ? "granted" : "denied",
-        })
-
-        // If analytics consent is granted, trigger a page view for the current page
-        if (consentPreferences.analytics && typeof window !== "undefined") {
-          window.gtag("event", "page_view", {
-            page_title: document.title,
-            page_location: window.location.href,
-            page_path: window.location.pathname,
-            send_to: "G-0LBYMRG5RQ",
-          })
-          console.log("Initial page view sent after consent granted")
-        }
-      } catch (e) {
-        console.error("Error updating consent:", e)
-      }
-    } else {
-      console.warn("Google Analytics not loaded yet, consent update queued")
-      // Queue the consent update for when GA loads
-      window.addEventListener("load", () => {
-        if (window.gtag) {
-          window.gtag("consent", "update", {
-            analytics_storage: consentPreferences.analytics ? "granted" : "denied",
-            ad_storage: consentPreferences.marketing ? "granted" : "denied",
-            personalization_storage: consentPreferences.personalization ? "granted" : "denied",
-          })
-
-          // If analytics consent is granted, trigger a page view for the current page
-          if (consentPreferences.analytics) {
-            window.gtag("event", "page_view", {
-              page_title: document.title,
-              page_location: window.location.href,
-              page_path: window.location.pathname,
-              send_to: "G-0LBYMRG5RQ",
-            })
-            console.log("Initial page view sent after consent granted (delayed)")
-          }
-        }
+    // Just dispatch the consent updated event
+    if (typeof window !== "undefined") {
+      const event = new CustomEvent("consentUpdated", {
+        detail: consentPreferences,
       })
+      document.dispatchEvent(event)
+      console.log("Consent preferences updated:", consentPreferences)
     }
   }
 
@@ -319,10 +269,9 @@ export default function ConsentBanner() {
   )
 }
 
-// Add type definition for the global window object
+// Update the Window interface to remove gtag
 declare global {
   interface Window {
     openConsentManager?: () => void
-    gtag?: (...args: any[]) => void
   }
 }

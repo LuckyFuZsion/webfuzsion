@@ -1,80 +1,123 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable React strict mode for improved error handling
+  // Core settings
   reactStrictMode: true,
   
-  // Enable SWC minification for faster builds
-  swcMinify: true,
-  
+  // Build settings
   eslint: {
-    ignoreDuringBuilds: true,
+    // Only run ESLint on production builds
+    ignoreDuringBuilds: true
   },
   typescript: {
-    ignoreBuildErrors: true,
+    // Only run TypeScript type checking on production builds
+    ignoreBuildErrors: true
   },
-  // Add this to prevent trailing slash redirects
-  trailingSlash: false,
-  
-  // Configure images to allow all domains used in the project
+
+  // Image settings
   images: {
     domains: [
-      'v0.blob.com', 
-      'localhost', 
-      'hebbkx1anhila5yf.public.blob.vercel-storage.com',
-      'public.blob.vercel-storage.com',
-      'vercel-storage.com',
+      'webfuzsion.co.uk',
+      'www.webfuzsion.co.uk',
       'opengraph.b-cdn.net',
       'blob.v0.dev',
-      'gxciioabwrkahdfe.public.blob.vercel-storage.com'
+      '*'
     ],
-    // Set unoptimized to true globally to ensure images display correctly
+    formats: ['image/avif', 'image/webp'],
     unoptimized: true,
-    // Disable the image optimizer completely
-    loader: 'default',
-    disableStaticImages: false,
-    minimumCacheTTL: 60,
-    formats: ['image/webp'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**'
+      }
+    ]
   },
-  
-  // Disable unnecessary features
-  poweredByHeader: false,
-  
-  // Development-specific settings
-  ...(process.env.NODE_ENV === 'development' ? {
-    // Development settings
-    experimental: {
-      // Configure server actions
-      serverActions: {
-        allowedOrigins: ['localhost:3000'],
-        bodySizeLimit: '2mb'
+
+  // Experimental features
+  experimental: {
+    serverActions: true,
+    optimizeCss: true
+  },
+
+  // Server settings
+  serverExternalPackages: [
+    'sharp',
+    'framer-motion',
+    'nodemailer',
+    'react-email',
+    '@react-email/components',
+  ],
+
+  // Headers
+  headers: async () => [
+    {
+      source: '/:path*',
+      headers: [
+        {
+          key: 'X-DNS-Prefetch-Control',
+          value: 'on'
+        },
+        {
+          key: 'Strict-Transport-Security',
+          value: 'max-age=63072000; includeSubDomains; preload'
+        },
+        {
+          key: 'X-XSS-Protection',
+          value: '1; mode=block'
+        },
+        {
+          key: 'X-Frame-Options',
+          value: 'SAMEORIGIN'
+        },
+        {
+          key: 'X-Content-Type-Options',
+          value: 'nosniff'
+        },
+        {
+          key: 'Referrer-Policy',
+          value: 'origin-when-cross-origin'
+        }
+      ]
+    }
+  ],
+
+  // Webpack configuration
+  webpack: (config, { dev, isServer }) => {
+    if (!dev && !isServer) {
+      // Production optimizations
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          minSize: 20000,
+          maxSize: 244000,
+          minChunks: 1,
+          maxAsyncRequests: 30,
+          maxInitialRequests: 30,
+          cacheGroups: {
+            defaultVendors: {
+              test: /[\\/]node_modules[\\/]/,
+              priority: -10,
+              reuseExistingChunk: true
+            },
+            default: {
+              minChunks: 2,
+              priority: -20,
+              reuseExistingChunk: true
+            }
+          }
+        }
+      }
+
+      // Performance settings
+      config.performance = {
+        hints: false,
+        maxEntrypointSize: 512000,
+        maxAssetSize: 512000
       }
     }
-  } : {
-    // Production settings
-    experimental: {
-      // Production-only experimental features
-    }
-  }),
 
-  // Move serverComponentsExternalPackages to the root level
-  serverExternalPackages: [],
-  
-  // Remove all custom headers for now
-  async headers() {
-    return [
-      {
-        // Apply these headers to all routes
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'X-DNS-Prefetch-Control',
-            value: 'on',
-          },
-        ],
-      },
-    ];
-  },
-};
+    return config
+  }
+}
 
-// Export the final config
-export default nextConfig;
+export default nextConfig

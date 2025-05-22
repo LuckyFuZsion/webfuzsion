@@ -10,7 +10,7 @@ interface ServiceCardProps {
   gradient: string
 }
 
-export function ServiceCard({ title, description, icon: Icon, gradient }: ServiceCardProps) {
+export default function ServiceCard({ title, description, icon: Icon, gradient }: ServiceCardProps) {
   return (
     <motion.div
       className="bg-brand-dark/50 backdrop-blur-sm border border-white/10 rounded-xl p-5 hover:border-brand-pink/30 transition-all duration-300 hover:shadow-lg hover:shadow-brand-pink/5 cursor-card"

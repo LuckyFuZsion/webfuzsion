@@ -64,7 +64,7 @@ export function SafeImage({
           sizes={sizes || "100vw"}
           priority={priority}
           className={`transition-opacity duration-300 ${isLoading ? "opacity-0" : "opacity-100"} object-${objectFit}`}
-          onLoadingComplete={() => setIsLoading(false)}
+          onLoad={() => setIsLoading(false)}
           onError={handleImageError}
           quality={85}
         />
@@ -91,7 +91,7 @@ export function SafeImage({
         height={height || 100}
         priority={priority}
         className={`transition-opacity duration-300 ${isLoading ? "opacity-0" : "opacity-100"}`}
-        onLoadingComplete={() => setIsLoading(false)}
+        onLoad={() => setIsLoading(false)}
         onError={handleImageError}
         quality={85}
       />

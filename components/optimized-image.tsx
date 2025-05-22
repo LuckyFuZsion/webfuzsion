@@ -26,7 +26,7 @@ export function OptimizedImage({ src, alt, width, height, className, priority = 
           duration-700 ease-in-out
           ${isLoading ? "scale-110 blur-sm" : "scale-100 blur-0"}
         `}
-        onLoadingComplete={() => setIsLoading(false)}
+        onLoad={() => setIsLoading(false)}
         priority={priority}
         unoptimized={true} // Force unoptimized to ensure images load
       />

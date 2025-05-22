@@ -12,8 +12,8 @@ export function LogoSvg({ priority = false }: LogoSvgProps) {
         alt="WebFuZsion"
         width={180}
         height={40}
-        className="h-8 md:h-10 w-auto"
         priority={priority}
+        className="h-8 md:h-10 w-auto"
       />
     </div>
   )

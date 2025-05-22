@@ -1,0 +1,4 @@
+# Lock next.config.mjs to prevent accidental changes
+next.config.mjs -text
+next.config.mjs merge=binary
+next.config.mjs diff=binary 

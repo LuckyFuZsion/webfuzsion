@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { cdnMiddleware } from "./middleware-cdn"
 import { http2Middleware } from "./middleware-http2"
+import { jwtVerify } from "jose"
 
 function detectV0Environment(request: NextRequest): boolean {
   // Check various indicators that we might be in v0
@@ -18,67 +19,66 @@ function detectV0Environment(request: NextRequest): boolean {
   )
 }
 
-export function middleware(request: NextRequest) {
-  // Apply HTTP/2 middleware first
-  const http2Response = http2Middleware(request)
+// Paths that require authentication
+const PROTECTED_PATHS = ["/admin"]
+// Paths that are always public
+const PUBLIC_PATHS = [
+  "/api/admin/auth",
+  "/api/contact",
+  "/admin/login",  // Add login page to public paths
+  "/v0-admin",     // Also make v0-admin public
+  "/v0-admin/login"
+]
 
-  // Apply CDN middleware next
-  const cdnResponse = cdnMiddleware(request)
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
 
-  // Skip redirects for static assets or API routes
-  const pathname = request.nextUrl.pathname
-  if (
-    pathname.match(/\.(css|js|json|xml|txt|pdf|jpg|jpeg|png|gif|webp|svg|ico|ttf|woff|woff2)$/) ||
-    pathname.startsWith("/api/") ||
-    pathname.startsWith("/_next/")
-  ) {
-    return cdnResponse
+  // Allow public paths
+  if (PUBLIC_PATHS.some(path => pathname === path || pathname.startsWith(path + "/"))) {
+    return NextResponse.next()
   }
 
-  // Special v0 admin entry point - always allow
-  if (request.nextUrl.pathname.startsWith("/v0-admin")) {
-    return cdnResponse
+  // Check if the path requires authentication
+  const isProtectedPath = PROTECTED_PATHS.some(path => pathname.startsWith(path))
+  if (!isProtectedPath) {
+    return NextResponse.next()
   }
 
-  // For v0 environment, completely bypass authentication for admin routes
-  const isV0Environment = detectV0Environment(request)
+  // Get the auth token from cookies
+  const token = request.cookies.get("admin-auth-token")?.value
 
-  // Apply to all admin pages except login
-  if (request.nextUrl.pathname.startsWith("/admin") && !request.nextUrl.pathname.startsWith("/admin/login")) {
-    // In v0 environment, always allow access to admin routes
-    if (isV0Environment) {
-      console.log("v0 environment detected - bypassing auth check")
-      return cdnResponse
+  // If no token is present, redirect to login
+  if (!token) {
+    const url = new URL("/admin/login", request.url)
+    url.searchParams.set("from", pathname)
+    return NextResponse.redirect(url)
+  }
+
+  try {
+    // Verify the token
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET not configured")
     }
 
-    try {
-      // Regular authentication flow for production
-      const authCookie = request.cookies.get("admin-auth")
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+    await jwtVerify(token, secret)
 
-      // If not authenticated, redirect to login
-      if (!authCookie || authCookie.value !== "authenticated") {
-        const url = request.nextUrl.clone()
-        url.pathname = "/admin/login"
-        // Add the original URL as a query parameter to redirect back after login
-        url.searchParams.set("callbackUrl", request.nextUrl.pathname)
-        return NextResponse.redirect(url)
-      }
-    } catch (error) {
-      console.error("Middleware error:", error)
-
-      // In case of error in production, redirect to login as a fallback
-      const url = request.nextUrl.clone()
-      url.pathname = "/admin/login"
-      return NextResponse.redirect(url)
-    }
+    // Token is valid, allow the request
+    return NextResponse.next()
+  } catch (error) {
+    // Token is invalid or expired, redirect to login
+    console.error("Auth middleware error:", error)
+    const url = new URL("/admin/login", request.url)
+    url.searchParams.set("from", pathname)
+    return NextResponse.redirect(url)
   }
-
-  return cdnResponse
 }
 
 export const config = {
   matcher: [
-    // Match all paths
-    "/:path*",
-  ],
+    // Match all admin routes except login and v0-admin
+    "/admin/((?!login|v0-admin).)*",
+    // Match all admin API routes except auth
+    "/api/admin/((?!auth).)*"
+  ]
 }

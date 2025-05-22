@@ -3,6 +3,7 @@
 import { z } from "zod"
 import nodemailer from "nodemailer"
 import { getGmailConfig, getEmailAddresses } from "@/lib/gmail-config"
+import { type FormState, type FormErrors } from "@/lib/form-types"
 
 // Define validation schema
 const FormSchema = z.object({
@@ -13,55 +14,71 @@ const FormSchema = z.object({
   message: z.string().min(1, { message: "Message is required" }),
 })
 
-type FormState = {
-  success: boolean
-  message: string
-  errors?: {
-    name?: string[]
-    email?: string[]
-    subject?: string[]
-    message?: string[]
-    enquiryType?: string[]
-  }
+function formatZodErrors(error: z.ZodError): FormErrors {
+  const formattedErrors: FormErrors = {}
+  const fieldErrors = error.format()
+  
+  Object.entries(fieldErrors).forEach(([key, value]) => {
+    if (key !== "_errors" && typeof value === "object" && value !== null) {
+      const fieldValue = value as { _errors?: string[] }
+      if (fieldValue._errors && fieldValue._errors.length > 0) {
+        const fieldKey = key as keyof FormErrors
+        formattedErrors[fieldKey] = fieldValue._errors
+      }
+    }
+  })
+  
+  return formattedErrors
 }
 
 export async function submitContactForm(prevState: FormState, formData: FormData): Promise<FormState> {
-  // Extract form data
-  const rawFormData = {
-    name: formData.get("name"),
-    email: formData.get("email"),
-    subject: formData.get("subject"),
-    enquiryType: formData.get("enquiryType"),
-    message: formData.get("message"),
-  }
-
-  console.log("Form data received:", rawFormData)
-
-  // Validate form data
-  const validationResult = FormSchema.safeParse({
-    name: rawFormData.name,
-    email: rawFormData.email,
-    subject: rawFormData.subject,
-    enquiryType: rawFormData.enquiryType || "Business Site",
-    message: rawFormData.message,
-  })
-
-  // If validation fails, return errors
-  if (!validationResult.success) {
-    console.log("Validation failed:", validationResult.error.format())
-    return {
-      success: false,
-      message: "Please check the form for errors",
-      errors: validationResult.error.format(),
-    }
-  }
-
-  const { name, email, subject, enquiryType, message } = validationResult.data
-
   try {
+    // Extract form data
+    const rawFormData = {
+      name: formData.get("name")?.toString().trim() || "",
+      email: formData.get("email")?.toString().trim() || "",
+      subject: formData.get("subject")?.toString().trim() || "",
+      enquiryType: formData.get("enquiryType")?.toString() || "Business Site",
+      message: formData.get("message")?.toString().trim() || "",
+    }
+
+    console.log("Form data received:", rawFormData)
+
+    // Validate form data
+    const validationResult = FormSchema.safeParse(rawFormData)
+
+    // If validation fails, return errors
+    if (!validationResult.success) {
+      console.log("Validation failed:", validationResult.error.format())
+      return {
+        success: false,
+        message: "Please check the form for errors",
+        errors: formatZodErrors(validationResult.error),
+      }
+    }
+
+    const { name, email, subject, enquiryType, message } = validationResult.data
+
     // Get Gmail configuration
     const gmailConfig = getGmailConfig()
+    if (!gmailConfig) {
+      console.error("Gmail configuration is missing")
+      return {
+        success: false,
+        message: "Server configuration error. Please try again later.",
+        errors: {},
+      }
+    }
+
     const emailAddresses = getEmailAddresses()
+    if (!emailAddresses) {
+      console.error("Email addresses configuration is missing")
+      return {
+        success: false,
+        message: "Server configuration error. Please try again later.",
+        errors: {},
+      }
+    }
 
     // If there's a hardcoded recipient email, update it
     const recipientEmail = process.env.EMAIL_TO || "info.webfuzsion@gmail.com"
@@ -93,12 +110,14 @@ export async function submitContactForm(prevState: FormState, formData: FormData
     return {
       success: true,
       message: "Your message has been sent successfully! We'll be in touch soon.",
+      errors: {},
     }
   } catch (error) {
-    console.error("Error sending email:", error)
+    console.error("Error in submitContactForm:", error)
     return {
       success: false,
-      message: "Failed to send your message. Please try again later.",
+      message: "An unexpected error occurred. Please try again later.",
+      errors: {},
     }
   }
 }

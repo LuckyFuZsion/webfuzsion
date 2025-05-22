@@ -14,15 +14,7 @@ interface PricingCardProps {
   gradient: string
 }
 
-export function PricingCard({
-  title,
-  price,
-  earlyBirdPrice,
-  description,
-  features,
-  isPopular = false,
-  gradient,
-}: PricingCardProps) {
+export default function PricingCard({ title, price, earlyBirdPrice, description, features, isPopular, gradient }: PricingCardProps) {
   return (
     <motion.div
       className={`relative bg-brand-dark/50 backdrop-blur-sm border border-white/10 rounded-xl p-5 ${

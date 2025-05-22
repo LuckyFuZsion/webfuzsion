@@ -12,10 +12,15 @@ interface Testimonial {
 }
 
 interface TestimonialCarouselProps {
-  testimonials: Testimonial[]
+  testimonials: Array<{
+    name: string
+    role: string
+    content: string
+    rating: number
+  }>
 }
 
-export function TestimonialCarousel({ testimonials }: TestimonialCarouselProps) {
+export default function TestimonialCarousel({ testimonials }: TestimonialCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [direction, setDirection] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)

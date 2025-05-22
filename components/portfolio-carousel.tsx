@@ -17,7 +17,11 @@ interface PortfolioItem {
   isLocalBusiness?: boolean
 }
 
-export function PortfolioCarousel() {
+interface PortfolioCarouselProps {
+  items: PortfolioItem[]
+}
+
+export default function PortfolioCarousel({ items }: PortfolioCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [cardsToShow, setCardsToShow] = useState(1)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -31,112 +35,6 @@ export function PortfolioCarousel() {
   const maxTapDistance = 10 // Maximum distance for a tap
   const maxTapDuration = 200 // Maximum duration for a tap in ms
   const [isMobile, setIsMobile] = useState(false)
-
-  const portfolioItems: PortfolioItem[] = [
-    {
-      id: "jammmy-slots",
-      title: "JammmySlots",
-      type: "Content Creator Platform",
-      imageUrl: "/images/jammmy-slots.png",
-      websiteUrl: "https://jammmyslots.com",
-      siteType: "Premium Site",
-      description:
-        "A custom-built platform for a casino content creator with advanced features including loyalty systems, leaderboards, and user management.",
-      features: [
-        "Custom Built Loyalty System",
-        "Custom Built Admin Panel",
-        "Custom Built User Areas",
-        "User Management",
-        "Custom Built Leaderboards",
-        "Custom API Creation",
-        "Discord Login Integration",
-        "Promotional Section",
-        "Database Creation/Hosting",
-      ],
-    },
-    {
-      id: "pressure-washer",
-      title: "Pressure Washer Coils",
-      type: "E-commerce",
-      imageUrl: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Daz-kz9AmlTpITyp1rj1P4gJH3tlGdDWzW.png",
-      websiteUrl: "https://pressurewashercoils4u.co.uk",
-      siteType: "Starter Site",
-      description:
-        "An e-commerce website for a specialist supplier of pressure washer coils for various brands and models.",
-      features: [
-        "Mobile-responsive design",
-        "Product catalog with categories",
-        "Brand-specific product pages",
-        "Contact form integration",
-        "SEO optimization for local searches",
-      ],
-      isLocalBusiness: true,
-    },
-    {
-      id: "sharkys",
-      title: "Sharky's Bar",
-      type: "Bar & Restaurant",
-      imageUrl: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Sharkys-xwamnR7NCqNuVFMbeVwFJ1qFz4H7eu.png",
-      websiteUrl: "https://www.sharkys-albufeira.com/",
-      siteType: "Business Site",
-      description: "A vibrant website for a popular bar and restaurant located in Marina de Albufeira.",
-      features: [
-        "Interactive menu display",
-        "Photo gallery of the venue",
-        "Events calendar integration",
-        "Location map and directions",
-        "Social media integration",
-      ],
-      isLocalBusiness: false,
-    },
-    {
-      id: "andys",
-      title: "Andy's Man & Van",
-      type: "Removal Services",
-      imageUrl: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Andys-OMLoFkQ0tDeH0pbOIKCmrfnsUfo8kv.png",
-      websiteUrl: "https://andysmanandvan.vercel.app/",
-      siteType: "Starter Site",
-      description: "A professional website for a local moving and clearance service based in Grantham.",
-      features: [
-        "Service details and pricing",
-        "Customer testimonials",
-        "Direct call button integration",
-        "Mobile-first design",
-        "Local SEO optimization",
-      ],
-      isLocalBusiness: true,
-    },
-    {
-      id: "mt-plumbing",
-      title: "MT Plumbing",
-      type: "Plumbing Services",
-      imageUrl: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/MT-xCSdeqydNbUcX0qaHGws9Bx3Sm4Twp.png",
-      websiteUrl: "https://www.mtplumbing.uk/",
-      siteType: "Starter Site",
-      description:
-        "A clean, professional website for a Gas Safe registered plumber serving Grantham and surrounding areas.",
-      features: [
-        "Service area map",
-        "Credentials and certifications display",
-        "Emergency contact information",
-        "WhatsApp integration",
-        "Customer testimonials",
-      ],
-      isLocalBusiness: true,
-    },
-    {
-      id: "painted-gardener",
-      title: "The Painted Gardener",
-      type: "Gardening Services",
-      imageUrl:
-        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/paintedgardener%20%281%29-EpnbMBuO2qGkETByQAXVchFgYrHRkx.png",
-      websiteUrl: "https://thepaintedgardener.co.uk",
-      siteType: "Starter Site",
-      description: "A vibrant website for a dual-service business offering both painting and gardening services.",
-      features: ["Service showcase", "Photo gallery", "Contact information", "About section", "Testimonials"],
-      isLocalBusiness: true,
-    },
-  ]
 
   // Set the number of cards to show based on screen size
   useEffect(() => {
@@ -210,7 +108,7 @@ export function PortfolioCarousel() {
   }
 
   // Calculate the number of pages
-  const pageCount = Math.ceil(portfolioItems.length / cardsToShow)
+  const pageCount = Math.ceil(items.length / cardsToShow)
 
   const goToPrevious = () => {
     setCurrentIndex((prevIndex) => (prevIndex === 0 ? pageCount - 1 : prevIndex - 1))
@@ -221,16 +119,16 @@ export function PortfolioCarousel() {
   }
 
   // Get items for the current page
-  const getCurrentPageItems = () => {
-    const startIndex = (currentIndex * cardsToShow) % portfolioItems.length
-    const items = []
+  const getCurrentPageItems = (): PortfolioItem[] => {
+    const startIndex = (currentIndex * cardsToShow) % items.length
+    const currentItems: PortfolioItem[] = []
 
     for (let i = 0; i < cardsToShow; i++) {
-      const itemIndex = (startIndex + i) % portfolioItems.length
-      items.push(portfolioItems[itemIndex])
+      const itemIndex = (startIndex + i) % items.length
+      currentItems.push(items[itemIndex])
     }
 
-    return items
+    return currentItems
   }
 
   return (
