@@ -8,6 +8,10 @@ import { TextReveal } from "@/components/text-reveal"
 import { AnimatedSection } from "@/components/animated-section"
 import Link from "next/link"
 import Image from "next/image"
+import dynamic from "next/dynamic"
+
+// Dynamically import components that use Framer Motion
+const MotionDiv = dynamic(() => import("framer-motion").then(mod => mod.motion.div), { ssr: false })
 
 interface BlogPost {
   slug: string
@@ -151,18 +155,18 @@ export default function BlogPage() {
 
       <Header />
 
-      {/* Hero Section - Reduced padding */}
-      <section className="pt-20 pb-4 md:pt-24 md:pb-4 relative overflow-hidden">
-        <div className="container mx-auto px-4 relative z-10">
+      {/* Hero Section */}
+      <section className="relative z-10 pt-24 pb-12">
+        <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto">
-            <motion.div
+            <MotionDiv
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               className="inline-block bg-brand-pink/20 backdrop-blur-sm border border-brand-pink/30 rounded-full px-4 py-1 text-sm text-brand-pink font-medium mb-3"
             >
               <span>Web Design Insights</span>
-            </motion.div>
+            </MotionDiv>
 
             <TextReveal direction="up" delay={0.2}>
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-3">WebFuZsion Blog</h1>
@@ -178,8 +182,8 @@ export default function BlogPage() {
         </div>
       </section>
 
-      {/* Blog Posts Grid - Reduced padding and gap */}
-      <section className="py-4 relative">
+      {/* Blog Posts Grid */}
+      <section className="relative z-10 pb-24">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {blogPosts.map((post, index) => (
