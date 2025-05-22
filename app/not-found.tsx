@@ -2,8 +2,7 @@
 
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { ClientMotionDiv } from "./components/motion/client-motion"
-import Link from "next/link"
+import { AnimatedNotFound } from "./components/motion/not-found-animation"
 
 export default function NotFound() {
   return (
@@ -19,24 +18,7 @@ export default function NotFound() {
 
       <div className="container mx-auto px-4 py-24 relative z-10">
         <div className="text-center max-w-2xl mx-auto">
-          <ClientMotionDiv
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="mb-8"
-          >
-            <h1 className="text-6xl font-bold mb-4">404</h1>
-            <h2 className="text-2xl font-semibold mb-4">Page Not Found</h2>
-            <p className="text-gray-300 mb-8">
-              The page you're looking for doesn't exist or has been moved.
-            </p>
-            <Link
-              href="/"
-              className="inline-block bg-brand-blue hover:bg-brand-blue/80 text-white px-6 py-3 rounded-md transition-colors"
-            >
-              Return Home
-            </Link>
-          </ClientMotionDiv>
+          <AnimatedNotFound />
         </div>
       </div>
 
