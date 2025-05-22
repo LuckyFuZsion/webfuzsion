@@ -16,27 +16,33 @@ export async function generateSlug(title: string): Promise<string> {
 }
 
 // Function to save a blog post
-export async function saveBlogPost(formData: FormData): Promise<{ success: boolean; message: string; slug?: string }> {
+export async function saveBlogPost(
+  formData: FormData,
+): Promise<{ success: boolean; message: string; slug?: string; error?: string }> {
   try {
     // Extract data from form
     const title = formData.get("title") as string
     const content = formData.get("content") as string
     const excerpt = formData.get("excerpt") as string
     const author = formData.get("author") as string
-    const tags = (formData.get("tags") as string).split(",").map((tag) => tag.trim())
+    const tagsInput = formData.get("tags") as string
+    const tags = tagsInput ? tagsInput.split(",").map((tag) => tag.trim()) : []
     const category = formData.get("category") as string
     const image = formData.get("image") as string
+    const userSlug = formData.get("slug") as string
+
+    console.log("Form data received:", { title, excerpt, author, tagsInput, category, image, userSlug })
 
     // Validate required fields
-    if (!title || !content || !excerpt || !author || !category) {
-      return {
-        success: false,
-        message: "Please fill in all required fields",
-      }
-    }
+    if (!title) return { success: false, message: "Title is required", error: "Missing title" }
+    if (!content) return { success: false, message: "Content is required", error: "Missing content" }
+    if (!excerpt) return { success: false, message: "Excerpt is required", error: "Missing excerpt" }
+    if (!author) return { success: false, message: "Author is required", error: "Missing author" }
+    if (!category) return { success: false, message: "Category is required", error: "Missing category" }
 
-    // Generate slug from title
-    const slug = await generateSlug(title)
+    // Generate slug from title or use provided slug
+    const slug = userSlug ? userSlug : await generateSlug(title)
+    console.log("Generated slug:", slug)
 
     // Calculate reading time (rough estimate: 200 words per minute)
     const wordCount = content.split(/\s+/).length
@@ -56,16 +62,21 @@ export async function saveBlogPost(formData: FormData): Promise<{ success: boole
       category,
     }
 
+    console.log("Blog post object created:", blogPost)
+
     // Create the blog post directory and file
     const dirPath = path.join(process.cwd(), "app/blog", slug)
+    console.log("Directory path:", dirPath)
 
     try {
       await fs.mkdir(dirPath, { recursive: true })
+      console.log("Directory created successfully")
     } catch (error) {
       console.error("Error creating directory:", error)
       return {
         success: false,
         message: "Failed to create blog directory",
+        error: error instanceof Error ? error.message : String(error),
       }
     }
 
@@ -75,7 +86,7 @@ import { Metadata } from 'next'
 import BlogPostClient from '../[slug]/BlogPostClient'
 
 export const metadata: Metadata = {
-  title: '${title} | WebFuZsion',
+  title: '${title.replace(/'/g, "\\'")} | WebFuZsion',
   description: '${excerpt.replace(/'/g, "\\'")}',
 }
 
@@ -97,18 +108,24 @@ export default function BlogPostPage() {
 }
 `
 
+    const filePath = path.join(dirPath, "page.tsx")
+    console.log("File path:", filePath)
+
     try {
-      await fs.writeFile(path.join(dirPath, "page.tsx"), pageContent)
+      await fs.writeFile(filePath, pageContent)
+      console.log("File written successfully")
     } catch (error) {
       console.error("Error writing file:", error)
       return {
         success: false,
         message: "Failed to write blog file",
+        error: error instanceof Error ? error.message : String(error),
       }
     }
 
     // Revalidate the blog path to update the site
     revalidatePath("/blog")
+    console.log("Blog path revalidated")
 
     return {
       success: true,
@@ -120,6 +137,7 @@ export default function BlogPostPage() {
     return {
       success: false,
       message: "An unexpected error occurred",
+      error: error instanceof Error ? error.message : String(error),
     }
   }
 }

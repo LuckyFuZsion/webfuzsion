@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation"
 import RichTextEditor from "../../components/rich-text-editor"
 import BlogPreview from "../../components/blog-preview"
 import { saveBlogPost } from "../../../actions/blog-actions"
-import "./blog-styles.css"
 
 export default function NewBlogPost() {
   const router = useRouter()
@@ -17,18 +16,20 @@ export default function NewBlogPost() {
   const [content, setContent] = useState("")
   const [author, setAuthor] = useState("WebFuZsion")
   const [category, setCategory] = useState("Web Design")
-  const [tags, setTags] = useState("")
+  const [tags, setTags] = useState("web design, website")
   const [image, setImage] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [message, setMessage] = useState({ type: "", text: "" })
+  const [message, setMessage] = useState({ type: "", text: "", details: "" })
   const [activeTab, setActiveTab] = useState("edit") // "edit" or "preview"
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    setMessage({ type: "", text: "" })
+    setMessage({ type: "", text: "", details: "" })
 
     try {
+      console.log("Submitting form with data:", { title, slug, excerpt, content, author, category, tags, image })
+
       const formData = new FormData()
       formData.append("title", title)
       formData.append("slug", slug)
@@ -39,20 +40,30 @@ export default function NewBlogPost() {
       formData.append("tags", tags)
       formData.append("image", image)
 
+      console.log("Form data created, calling saveBlogPost")
       const result = await saveBlogPost(formData)
+      console.log("Result from saveBlogPost:", result)
 
       if (result.success) {
-        setMessage({ type: "success", text: "Blog post published successfully!" })
+        setMessage({ type: "success", text: "Blog post published successfully!", details: "" })
         // Optionally redirect to the blog list or the new post
         setTimeout(() => {
-          router.push("/admin/blog")
+          router.push(`/blog/${result.slug}`)
         }, 2000)
       } else {
-        setMessage({ type: "error", text: result.error || "Failed to publish blog post." })
+        setMessage({
+          type: "error",
+          text: "Failed to publish blog post",
+          details: result.error || result.message || "Unknown error",
+        })
       }
     } catch (error) {
-      setMessage({ type: "error", text: "An unexpected error occurred." })
-      console.error("Error publishing blog post:", error)
+      console.error("Error in handleSubmit:", error)
+      setMessage({
+        type: "error",
+        text: "An unexpected error occurred",
+        details: error instanceof Error ? error.message : String(error),
+      })
     } finally {
       setIsSubmitting(false)
     }
@@ -112,7 +123,8 @@ Another paragraph with more content.`
             message.type === "success" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
           }`}
         >
-          {message.text}
+          <p className="font-medium">{message.text}</p>
+          {message.details && <p className="mt-2 text-sm">{message.details}</p>}
         </div>
       )}
 
@@ -241,6 +253,7 @@ Another paragraph with more content.`
                     value={image}
                     onChange={(e) => setImage(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    placeholder="https://example.com/image.jpg"
                   />
                 </div>
               </div>
