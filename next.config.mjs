@@ -20,24 +20,14 @@ const nextConfig = {
       'www.webfuzsion.co.uk',
       'opengraph.b-cdn.net',
       'blob.v0.dev',
-      '*'
     ],
     formats: ['image/avif', 'image/webp'],
     unoptimized: true,
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**'
-      }
-    ]
   },
 
   // Experimental features
   experimental: {
-    serverActions: {
-      allowedOrigins: ['webfuzsion.co.uk', 'www.webfuzsion.co.uk'],
-      bodySizeLimit: '2mb'
-    }
+    serverActions: true,
   },
 
   // Server settings
