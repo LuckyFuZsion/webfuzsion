@@ -8,27 +8,19 @@ import { AnimatedSection } from "@/components/animated-section"
 import { ClientMotionDiv } from "../components/motion/client-motion"
 import Link from "next/link"
 import Image from "next/image"
-import { BlogPost } from "./types"
-import { formatDate } from "./utils"
-import { useTheme } from "next-themes"
-import { cn } from "@/lib/utils"
-import { motion } from "framer-motion"
-import { useInView } from "framer-motion"
-import { useRef } from "react"
-import { BlogSocialShare } from "@/components/blog-social-share"
 
-interface BlogPost {
-  slug: string
-  title: string
-  excerpt: string
-  date: string
-  category: string
-  imageUrl: string
-}
+// interface BlogPost {
+//   slug: string
+//   title: string
+//   excerpt: string
+//   date: string
+//   category: string
+//   imageUrl: string
+// }
 
 export default function BlogPage() {
   // Complete blog posts list - updated to include the new SEO strategy post
-  const blogPosts: BlogPost[] = [
+  const blogPosts = [
     {
       slug: "top-10-website-template-mistakes",
       title: "The Top 10 Mistakes of Making Your Own Website with Templates",
