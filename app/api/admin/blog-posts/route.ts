@@ -2,24 +2,46 @@ import { NextResponse } from "next/server"
 import fs from "fs"
 import path from "path"
 
+// Update the GET function to include more detailed error handling and logging
+
 export async function GET() {
   try {
     // Path to the blog directory
     const blogDir = path.join(process.cwd(), "app", "blog")
+    console.log(`Checking blog directory: ${blogDir}`)
+
+    // Check if the directory exists
+    if (!fs.existsSync(blogDir)) {
+      console.error(`Blog directory does not exist: ${blogDir}`)
+      return NextResponse.json(
+        {
+          error: "Blog directory not found",
+          path: blogDir,
+          exists: false,
+        },
+        { status: 404 },
+      )
+    }
 
     // Get all directories in the blog folder (each blog post has its own directory)
     const entries = fs.readdirSync(blogDir, { withFileTypes: true })
+    console.log(`Found ${entries.length} entries in blog directory`)
 
     // Filter out directories and exclude non-blog post directories
     const blogSlugs = entries
       .filter((entry) => entry.isDirectory() && !["[slug]", "components", "utils"].includes(entry.name))
       .map((dir) => dir.name)
 
+    console.log(`Found ${blogSlugs.length} potential blog posts`)
+
     // Collect blog post data
-    const posts = blogSlugs.map((slug) => {
+    const posts = []
+    for (const slug of blogSlugs) {
       try {
         // Try to read the page.tsx file to extract metadata
         const pagePath = path.join(blogDir, slug, "page.tsx")
+        console.log(`Checking page file: ${pagePath}`)
+
         if (fs.existsSync(pagePath)) {
           const content = fs.readFileSync(pagePath, "utf8")
 
@@ -39,27 +61,21 @@ export async function GET() {
           const authorMatch = content.match(/author: ["'](.+?)["']/)
           const author = authorMatch ? authorMatch[1] : "Unknown author"
 
-          return {
+          posts.push({
             slug,
             title,
             excerpt,
             date,
             author,
-          }
+          })
+          console.log(`Successfully processed blog post: ${slug}`)
+        } else {
+          console.log(`Page file does not exist for slug: ${slug}`)
         }
       } catch (err) {
         console.error(`Error processing blog post ${slug}:`, err)
       }
-
-      // Fallback if we couldn't extract metadata
-      return {
-        slug,
-        title: slug.replace(/-/g, " "),
-        excerpt: "",
-        date: "Unknown date",
-        author: "Unknown author",
-      }
-    })
+    }
 
     // Sort posts by date (newest first)
     posts.sort((a, b) => {
@@ -68,9 +84,17 @@ export async function GET() {
       return isNaN(dateA.getTime()) || isNaN(dateB.getTime()) ? 0 : dateB.getTime() - dateA.getTime()
     })
 
-    return NextResponse.json({ posts })
+    console.log(`Returning ${posts.length} blog posts`)
+    return NextResponse.json({ posts, count: posts.length })
   } catch (error) {
     console.error("Error fetching blog posts:", error)
-    return NextResponse.json({ error: "Failed to fetch blog posts" }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: "Failed to fetch blog posts",
+        message: error.message,
+        stack: error.stack,
+      },
+      { status: 500 },
+    )
   }
 }
