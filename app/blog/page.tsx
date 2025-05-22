@@ -3,15 +3,11 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { ArrowRight } from "lucide-react"
-import { motion } from "framer-motion"
 import { TextReveal } from "@/components/text-reveal"
 import { AnimatedSection } from "@/components/animated-section"
+import { ClientMotionDiv } from "@/components/client-motion"
 import Link from "next/link"
 import Image from "next/image"
-import dynamic from "next/dynamic"
-
-// Dynamically import components that use Framer Motion
-const MotionDiv = dynamic(() => import("framer-motion").then(mod => mod.motion.div), { ssr: false })
 
 interface BlogPost {
   slug: string
@@ -159,14 +155,14 @@ export default function BlogPage() {
       <section className="relative z-10 pt-24 pb-12">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto">
-            <MotionDiv
+            <ClientMotionDiv
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               className="inline-block bg-brand-pink/20 backdrop-blur-sm border border-brand-pink/30 rounded-full px-4 py-1 text-sm text-brand-pink font-medium mb-3"
             >
               <span>Web Design Insights</span>
-            </MotionDiv>
+            </ClientMotionDiv>
 
             <TextReveal direction="up" delay={0.2}>
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-3">WebFuZsion Blog</h1>

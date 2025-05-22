@@ -27,7 +27,10 @@ const nextConfig = {
 
   // Experimental features
   experimental: {
-    serverActions: true,
+    serverActions: {
+      allowedOrigins: ['webfuzsion.co.uk', 'www.webfuzsion.co.uk'],
+      bodySizeLimit: '2mb'
+    },
   },
 
   // Server settings

@@ -3,15 +3,11 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { ArrowLeft } from "lucide-react"
-import dynamic from "next/dynamic"
+import { ClientMotionDiv, ClientMotionH1 } from "@/components/client-motion"
 import Link from "next/link"
 import Image from "next/image"
 import { useEffect } from "react"
 import { BlogSocialShare } from "@/components/blog-social-share"
-
-// Dynamically import Framer Motion components
-const MotionDiv = dynamic(() => import("framer-motion").then(mod => mod.motion.div), { ssr: false })
-const MotionH1 = dynamic(() => import("framer-motion").then(mod => mod.motion.h1), { ssr: false })
 
 interface BlogPost {
   title: string
@@ -80,25 +76,25 @@ export default function BlogPostClient({ post, blogPost, slug }: BlogPostClientP
 
           {/* Blog Post Header */}
           <div className="mb-8">
-            <MotionDiv
+            <ClientMotionDiv
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               className="inline-block bg-brand-pink/20 backdrop-blur-sm border border-brand-pink/30 rounded-full px-4 py-1 text-sm text-brand-pink font-medium mb-3"
             >
               <span>{blogData.category}</span>
-            </MotionDiv>
+            </ClientMotionDiv>
 
-            <MotionH1
+            <ClientMotionH1
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
               className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4"
             >
               {blogData.title}
-            </MotionH1>
+            </ClientMotionH1>
 
-            <MotionDiv
+            <ClientMotionDiv
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
@@ -109,11 +105,11 @@ export default function BlogPostClient({ post, blogPost, slug }: BlogPostClientP
               <span>{blogData.author}</span>
               <span>•</span>
               <span>{blogData.readTime}</span>
-            </MotionDiv>
+            </ClientMotionDiv>
           </div>
 
           {/* Featured Image */}
-          <MotionDiv
+          <ClientMotionDiv
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
@@ -127,16 +123,16 @@ export default function BlogPostClient({ post, blogPost, slug }: BlogPostClientP
               priority
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
             />
-          </MotionDiv>
+          </ClientMotionDiv>
 
           {/* Blog Content */}
-          <MotionDiv
+          <ClientMotionDiv
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
             className="prose prose-lg prose-invert max-w-none"
             dangerouslySetInnerHTML={{ __html: blogData.content }}
-          ></MotionDiv>
+          ></ClientMotionDiv>
 
           {/* Social Share Buttons */}
           <BlogSocialShare title={blogData.title} url={`https://webfuzsion.co.uk/blog/${slug}`} />
