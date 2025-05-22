@@ -3,6 +3,9 @@
 import { useEffect, useState, useRef } from "react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import ServiceCard from "@/components/service-card"
+import PricingCard from "@/components/pricing-card"
+import PricingCubeCarousel from "@/components/pricing-cube-carousel"
 import { Button } from "@/components/ui/button"
 import { Laptop, Layout, RefreshCw, Wrench, Phone, Mail, MessageSquare } from "lucide-react"
 import { AnimatedSection } from "@/components/animated-section"
@@ -14,27 +17,23 @@ import { TransitionEffect } from "@/components/transition-effect"
 import { SectionIndicator } from "@/components/section-indicator"
 import { MagneticButton } from "@/components/magnetic-button"
 import { TextReveal } from "@/components/text-reveal"
+import TestimonialCarousel from "@/components/testimonial-carousel"
 import { SectionNavigator } from "@/components/section-navigator"
 import { SeoHeadings } from "@/components/seo-headings"
 import { useMobile } from "@/hooks/use-mobile"
+import FAQSection from "@/components/faq-section"
+import PortfolioCarousel from "@/components/portfolio-carousel"
+import ContactForm from "@/components/contact-form"
 import { SafeImage } from "@/components/safe-image"
-import dynamic from "next/dynamic"
-import { Suspense } from "react"
-import { cn } from "@/lib/utils"
-import { AnimatedHero } from "./components/motion/hero-animation"
-import { AnimatedFeatures } from "./components/motion/features-animation"
-import { AnimatedServices } from "./components/motion/services-animation"
-import { AnimatedTestimonials } from "./components/motion/testimonials-animation"
-import { AnimatedContact } from "./components/motion/contact-animation"
 
-// Loading component
-const LoadingSpinner = () => (
-  <div className="min-h-screen bg-brand-dark text-white flex items-center justify-center">
-    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-pink"></div>
-  </div>
-)
+// Add type for window.scrollTimeout
+declare global {
+  interface Window {
+    scrollTimeout?: number;
+  }
+}
 
-// Define types for portfolio items and FAQ items
+// Add back the PortfolioItem interface
 interface PortfolioItem {
   id: string
   title: string
@@ -47,109 +46,79 @@ interface PortfolioItem {
   isLocalBusiness?: boolean
 }
 
+// Add back the FAQItem interface
 interface FAQItem {
   question: string
   answer: string
 }
 
-// Dynamic imports with loading states
-const DynamicServiceCard = dynamic(() => import("@/components/service-card"), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-[300px] animate-pulse bg-brand-dark/20 rounded-xl" />
-  ),
-})
-
-const DynamicPricingCard = dynamic(() => import("@/components/pricing-card"), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-[400px] animate-pulse bg-brand-dark/20 rounded-xl" />
-  ),
-})
-
-const DynamicPricingCubeCarousel = dynamic(() => import("@/components/pricing-cube-carousel"), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-[500px] animate-pulse bg-brand-dark/20 rounded-xl" />
-  ),
-})
-
-const DynamicTestimonialCarousel = dynamic(() => import("@/components/testimonial-carousel"), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-[400px] animate-pulse bg-brand-dark/20 rounded-xl" />
-  ),
-})
-
-const DynamicPortfolioCarousel = dynamic(() => import("@/components/portfolio-carousel"), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-[500px] animate-pulse bg-brand-dark/20 rounded-xl" />
-  ),
-})
-
-const DynamicContactForm = dynamic(() => import("@/components/contact-form"), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-[600px] animate-pulse bg-brand-dark/20 rounded-xl" />
-  ),
-})
-
-const DynamicFAQSection = dynamic<{ items: FAQItem[]; title?: string; description?: string }>(() => import("@/components/faq-section"), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-[400px] animate-pulse bg-brand-dark/20 rounded-xl" />
-  ),
-})
-
-// Main page component
 export default function Home() {
-  const { isMobile } = useMobile()
   const heroRef = useRef<HTMLDivElement>(null)
-  const [isScrollingFast, setIsScrollingFast] = useState(false)
   const { scrollYProgress } = useScroll()
-  
-  // Convert motion values to CSS values using useTransform
   const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0])
   const scale = useTransform(scrollYProgress, [0, 0.2], [1, 0.9])
-  
-  // Create a style object with proper CSS values
-  const heroStyle = !isMobile ? {
-    opacity: opacity.get(),
-    transform: `scale(${scale.get()})`
-  } : undefined
+  const { isMobile, isPreloaded } = useMobile()
+
+  // Add a state for content visibility
+  const [contentVisible, setContentVisible] = useState(!isMobile)
+
+  // Ensure content is visible on mobile after a short delay
+  useEffect(() => {
+    if (isMobile) {
+      setContentVisible(true)
+    }
+  }, [isMobile])
+
+  // Track scroll speed to disable animations during fast scrolling
+  const [isScrollingFast, setIsScrollingFast] = useState(false)
+  const lastScrollY = useRef(0)
+  const lastScrollTime = useRef(Date.now())
 
   useEffect(() => {
-    let scrollTimeout: NodeJS.Timeout
-
     const handleScroll = () => {
-      setIsScrollingFast(true)
-      clearTimeout(scrollTimeout)
-      scrollTimeout = setTimeout(() => {
-        setIsScrollingFast(false)
-      }, 150)
+      const currentY = window.scrollY
+      const currentTime = Date.now()
+      const timeDiff = currentTime - lastScrollTime.current
+      const scrollDiff = Math.abs(currentY - lastScrollY.current)
+
+      const scrollSpeed = scrollDiff / (timeDiff || 1)
+
+      if (scrollSpeed > 1) {
+        setIsScrollingFast(true)
+        if (window.scrollTimeout) {
+          clearTimeout(window.scrollTimeout)
+        }
+        window.scrollTimeout = window.setTimeout(() => {
+          setIsScrollingFast(false)
+        }, 200)
+      }
+
+      lastScrollY.current = currentY
+      lastScrollTime.current = currentTime
     }
 
-    window.addEventListener("scroll", handleScroll)
+    window.addEventListener("scroll", handleScroll, { passive: true })
     return () => {
       window.removeEventListener("scroll", handleScroll)
-      clearTimeout(scrollTimeout)
+      if (window.scrollTimeout) {
+        clearTimeout(window.scrollTimeout)
+      }
     }
   }, [])
 
   useEffect(() => {
-    // Smooth scroll for anchor links
     document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-      anchor.addEventListener("click", (e) => {
+      anchor.addEventListener("click", (e: Event) => {
         e.preventDefault()
-        const href = anchor.getAttribute("href")
+        const target = anchor as HTMLAnchorElement
+        const href = target.getAttribute("href")
         if (!href) return
 
-        const target = document.querySelector(href)
-        if (!target) return
+        const targetElement = document.querySelector(href)
+        if (!targetElement) return
 
         window.scrollTo({
-          top: (target as HTMLElement).offsetTop - 80,
+          top: (targetElement as HTMLElement).offsetTop - 80,
           behavior: "smooth",
         })
       })
@@ -364,7 +333,7 @@ export default function Home() {
       ],
     },
     {
-      id: "andys-man-and-van",
+      id: "andy-man-van",
       title: "Andy's Man and Van",
       type: "Service Business",
       imageUrl: "/images/andys-new.webp",
@@ -387,7 +356,8 @@ export default function Home() {
       imageUrl: "/images/mt-plumbing-new.webp",
       websiteUrl: "https://www.mtplumbing.uk/",
       siteType: "Starter Site",
-      description: "A clean, professional website for a Gas Safe registered plumber serving Grantham and surrounding areas.",
+      description:
+        "A clean, professional website for a Gas Safe registered plumber serving Grantham and surrounding areas.",
       features: [
         "Service area map",
         "Credentials and certifications display",
@@ -398,7 +368,7 @@ export default function Home() {
       isLocalBusiness: true,
     },
     {
-      id: "the-painted-gardener",
+      id: "painted-gardener",
       title: "The Painted Gardener",
       type: "Gardening/Landscaping Business",
       imageUrl: "/images/painted-gardener-new.webp",
@@ -419,26 +389,370 @@ export default function Home() {
   const faqItems: FAQItem[] = [
     {
       question: "How much does a website cost?",
-      answer: "Our website packages start from £500 for a starter site. The final cost depends on your specific requirements, number of pages, and functionality needed. We offer transparent pricing with no hidden fees.",
+      answer: "Our website packages start from £500 for a starter site. The final cost depends on your specific requirements, number of pages, and functionality needed. We offer transparent pricing with no hidden fees."
     },
-    // ... other FAQ items ...
+    {
+      question: "How long does it take to build a website?",
+      answer: "A typical website takes 2-4 weeks to complete, depending on the complexity and your feedback timeline. We'll provide you with a detailed timeline during our initial consultation."
+    },
+    {
+      question: "Do you offer website maintenance?",
+      answer: "Yes, we offer comprehensive website maintenance packages to keep your site secure, updated, and performing at its best. This includes regular updates, security checks, and technical support."
+    },
+    {
+      question: "Can you help with my existing website?",
+      answer: "Absolutely! We can help improve, redesign, or fix issues with your existing website. We'll assess your current site and provide recommendations for improvements."
+    },
+    {
+      question: "Do you offer hosting services?",
+      answer: "Yes, we provide reliable hosting services with 99.9% uptime guarantee. Our hosting packages include SSL certificates, regular backups, and technical support."
+    },
+    {
+      question: "What if I need changes after the website is live?",
+      answer: "We offer post-launch support and can make any necessary changes to your website. We'll discuss your maintenance needs and provide a solution that works for your business."
+    },
+    {
+      question: "Do you offer SEO services?",
+      answer: "Yes, we implement SEO best practices during development and offer ongoing SEO services to help improve your website's visibility in search engines."
+    },
+    {
+      question: "What information do you need to start?",
+      answer: "We'll need your business details, target audience information, design preferences, and any specific features you want. We'll guide you through the process and help gather all necessary information."
+    },
+    {
+      question: "Do you provide training on how to use the website?",
+      answer: "Yes, we provide comprehensive training on how to manage and update your website. We'll ensure you're comfortable using the content management system."
+    },
+    {
+      question: "What payment methods do you accept?",
+      answer: "We accept various payment methods including bank transfer, credit/debit cards, and PayPal. We require a 50% deposit to start the project, with the balance due upon completion."
+    }
   ]
 
   return (
-    <div className="min-h-screen text-white overflow-hidden bg-gradient-to-br from-brand-dark via-brand-dark to-brand-dark/90">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-full bg-grid-pattern opacity-20"></div>
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-brand-blue/20 rounded-full blur-[120px]"></div>
-        <div className="absolute top-1/3 right-1/4 w-[600px] h-[600px] bg-brand-pink/20 rounded-full blur-[120px]"></div>
-        <div className="absolute bottom-0 right-1/3 w-[400px] h-[400px] bg-brand-purple/20 rounded-full blur-[120px]"></div>
+    <div className="min-h-screen overflow-hidden mobile-gradient-background">
+      <SeoHeadings />
+      <SectionNavigator />
+      {!isMobile && <TransitionEffect />}
+      <FloatingElements reducedOnMobile={isMobile} />
+      <ScrollProgress />
+      {!isMobile && <SectionIndicator />}
+      <Header />
+
+      {/* Preload all content on mobile */}
+      <div className={isMobile ? "opacity-100" : ""}>
+        {/* Hero Section */}
+        <section
+          ref={heroRef}
+          className="pt-24 pb-6 md:pt-32 md:pb-10 relative overflow-hidden section-anchor"
+          data-section-color="dark-purple"
+          aria-label="Hero"
+        >
+          <div 
+            className="container mx-auto px-4 relative z-[100]" 
+            style={isMobile ? undefined : {
+              opacity: opacity.get(),
+              transform: `scale(${scale.get()})`
+            }}
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div className="space-y-6">
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  className="inline-block bg-brand-pink/20 backdrop-blur-sm border border-brand-pink/30 rounded-full px-4 py-1 text-sm text-brand-pink font-medium"
+                >
+                  <span itemProp="slogan" className="text-brand-pink">Web Design Studio</span>
+                </motion.div>
+
+                <TextReveal direction="up" delay={0.2}>
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight !text-white" itemProp="name">
+                    Creating exceptional digital experiences
+                  </h1>
+                </TextReveal>
+
+                <TextReveal direction="up" delay={0.4}>
+                  <p className="text-xl !text-gray-300" itemProp="description">
+                    Professional web design for small businesses, tradesmen, local services, and content creators.
+                  </p>
+                </TextReveal>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.6 }}
+                  className="flex flex-wrap gap-4"
+                >
+                  <a href="#contact" aria-label="Get Started with WebFuZsion">
+                    <MagneticButton strength={isMobile ? 20 : 40}>
+                      <Button className="bg-brand-pink hover:bg-brand-pink/80 !text-white px-6 py-6">Get Started</Button>
+                    </MagneticButton>
+                  </a>
+                  <a href="#portfolio" aria-label="View Our Portfolio">
+                    <MagneticButton strength={isMobile ? 20 : 40}>
+                      <Button variant="outline" className="border-white/20 !text-white hover:bg-white/10 px-6 py-6">
+                        View Our Work
+                      </Button>
+                    </MagneticButton>
+                  </a>
+                </motion.div>
+              </div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  duration: 0.8,
+                  delay: 0.5,
+                  type: "spring",
+                  stiffness: 100,
+                }}
+                className="relative flex justify-center items-center"
+              >
+                <div className="relative h-[300px] w-[300px]">
+                  <motion.div
+                    animate={
+                      isScrollingFast
+                        ? {}
+                        : {
+                            y: [0, -20, 0],
+                            rotate: [0, 5, 0, -5, 0],
+                          }
+                    }
+                    transition={{
+                      duration: 10,
+                      repeat: Number.POSITIVE_INFINITY,
+                      repeatType: "reverse",
+                    }}
+                  >
+                    <SafeImage
+                      src="/images/webfuzsion-flame-logo.png"
+                      alt="WebFuZsion Web Design Studio Logo"
+                      width={300}
+                      height={300}
+                      className="object-contain"
+                      priority={true}
+                      style={{ width: "300px", height: "300px" }}
+                    />
+                  </motion.div>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-pink/10 rounded-full blur-[100px] -z-[1]"></div>
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-blue/10 rounded-full blur-[100px] -z-[1]"></div>
+        </section>
+
+        {/* Services Section */}
+        <section
+          id="services"
+          className="pt-4 pb-8 relative section-anchor"
+          data-section-color="purple-pink"
+          aria-label="services-heading"
+          itemScope
+          itemType="https://schema.org/Service"
+        >
+          <div className="container mx-auto px-4 relative z-[100]">
+            <AnimatedSection className="text-center max-w-3xl mx-auto mb-8" disableOnFastScroll={isScrollingFast}>
+              <TextReveal disableOnFastScroll={isScrollingFast}>
+                <h2 id="services-heading" className="text-3xl md:text-4xl font-bold mb-4 !text-white" itemProp="name">
+                  Our Services
+                </h2>
+              </TextReveal>
+              <TextReveal delay={0.2} disableOnFastScroll={isScrollingFast}>
+                <p className="!text-gray-300" itemProp="description">
+                  We offer a comprehensive range of web design and development services to help your business succeed
+                  online.
+                </p>
+              </TextReveal>
+            </AnimatedSection>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {services.map((service, index) => (
+                <AnimatedCard key={index} index={index} delay={0.2} disableOnFastScroll={isScrollingFast}>
+                  <div itemScope itemType="https://schema.org/Service">
+                    <ServiceCard
+                      title={service.title}
+                      description={service.description}
+                      icon={service.icon}
+                      gradient={service.gradient}
+                    />
+                    <meta itemProp="name" content={service.title} />
+                    <meta itemProp="description" content={service.description} />
+                  </div>
+                </AnimatedCard>
+              ))}
+            </div>
+          </div>
+
+          <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-brand-purple/10 rounded-full blur-[100px] -z-[1]"></div>
+        </section>
+
+        {/* Portfolio Section */}
+        <section id="portfolio" className="py-12 relative section-anchor" data-section-color="pink-blue">
+          <div className="container mx-auto px-4 relative z-[100]">
+            <AnimatedSection className="text-center max-w-3xl mx-auto mb-8" disableOnFastScroll={isScrollingFast}>
+              <TextReveal disableOnFastScroll={isScrollingFast}>
+                <h2 className="text-3xl md:text-4xl font-bold mb-4 !text-white">Our Portfolio</h2>
+              </TextReveal>
+              <TextReveal delay={0.2} disableOnFastScroll={isScrollingFast}>
+                <p className="!text-gray-300 mb-8">
+                  Take a look at some of the websites we've designed and developed for our clients.
+                  <span className="block mt-2 text-sm text-brand-pink">Tap on a card to see more details!</span>
+                </p>
+              </TextReveal>
+            </AnimatedSection>
+
+            <AnimatedSection delay={0.3} disableOnFastScroll={isScrollingFast}>
+              <PortfolioCarousel items={portfolioItems} />
+            </AnimatedSection>
+          </div>
+
+          <div className="absolute top-1/2 right-0 w-[600px] h-[600px] bg-brand-orange/10 rounded-full blur-[100px] -z-[1]"></div>
+        </section>
+
+        {/* Pricing Section */}
+        <section id="pricing" className="py-12 relative section-anchor" data-section-color="blue-orange">
+          <div className="container mx-auto px-4">
+            <AnimatedSection
+              className="text-center max-w-3xl mx-auto mb-8 hidden md:block"
+              disableOnFastScroll={isScrollingFast}
+            >
+              <TextReveal disableOnFastScroll={isScrollingFast}>
+                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Transparent Pricing</h2>
+              </TextReveal>
+              <TextReveal delay={0.2} disableOnFastScroll={isScrollingFast}>
+                <p className="text-gray-300">Choose the perfect package for your business needs and budget.</p>
+              </TextReveal>
+            </AnimatedSection>
+
+            <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {pricingPlans.map((plan, index) => (
+                <AnimatedCard key={index} index={index} delay={0.2} disableOnFastScroll={isScrollingFast}>
+                  <PricingCard
+                    title={plan.title}
+                    price={plan.price}
+                    earlyBirdPrice={plan.earlyBirdPrice}
+                    description={plan.description}
+                    features={plan.features}
+                    isPopular={plan.isPopular}
+                    gradient={plan.gradient}
+                  />
+                </AnimatedCard>
+              ))}
+            </div>
+
+            <div className="md:hidden">
+              <PricingCubeCarousel plans={pricingPlans} />
+            </div>
+          </div>
+        </section>
+
+        {/* Testimonials Section */}
+        <section id="testimonials" className="py-12 relative section-anchor" data-section-color="orange-purple">
+          <div className="container mx-auto px-4">
+            <AnimatedSection className="text-center max-w-3xl mx-auto mb-8" disableOnFastScroll={isScrollingFast}>
+              <TextReveal disableOnFastScroll={isScrollingFast}>
+                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Client Testimonials</h2>
+              </TextReveal>
+              <TextReveal delay={0.2} disableOnFastScroll={isScrollingFast}>
+                <p className="text-gray-300">
+                  Don't just take our word for it. Here's what our clients have to say about working with us. We're
+                  proud of our 5-star rating across all client reviews.
+                </p>
+              </TextReveal>
+            </AnimatedSection>
+
+            <AnimatedSection delay={0.3} disableOnFastScroll={isScrollingFast}>
+              <TestimonialCarousel testimonials={testimonials} />
+            </AnimatedSection>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section id="faq" className="py-16 relative section-anchor" data-section-color="purple-dark">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-white">Frequently Asked Questions</h2>
+            <p className="text-lg text-gray-300 text-center mb-12 max-w-3xl mx-auto">
+              Find answers to common questions about our web design and development services.
+            </p>
+            <FAQSection items={faqItems} />
+          </div>
+        </section>
+
+        {/* Contact Section */}
+        <section id="contact" className="py-12 relative section-anchor" data-section-color="purple-dark">
+          <div className="container mx-auto px-4">
+            <AnimatedSection className="text-center max-w-3xl mx-auto mb-8" disableOnFastScroll={isScrollingFast}>
+              <TextReveal disableOnFastScroll={isScrollingFast}>
+                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Get In Touch</h2>
+              </TextReveal>
+              <TextReveal delay={0.2} disableOnFastScroll={isScrollingFast}>
+                <p className="text-gray-300">Ready to start your project? Contact us today for a free consultation.</p>
+              </TextReveal>
+            </AnimatedSection>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+              <AnimatedSection
+                delay={0.2}
+                className="bg-brand-dark/50 backdrop-blur-sm border border-white/10 rounded-xl p-8"
+                disableOnFastScroll={isScrollingFast}
+              >
+                <h3 className="text-2xl font-bold mb-6 text-white">Contact Information</h3>
+                <div className="space-y-6">
+                  <motion.div whileHover={{ x: isMobile ? 0 : 5 }} className="flex items-start">
+                    <div className="bg-brand-pink/20 p-3 rounded-lg mr-4">
+                      <Phone className="h-6 w-6 text-brand-pink" />
+                    </div>
+                    <div>
+                      <p className="text-gray-400 mb-1">Phone / WhatsApp</p>
+                      <a
+                        href="tel:07590763430"
+                        className="text-xl font-medium text-white hover:text-brand-pink transition-colors"
+                      >
+                        07590 763430
+                      </a>
+                    </div>
+                  </motion.div>
+
+                  <motion.div whileHover={{ x: isMobile ? 0 : 5 }} className="flex items-start">
+                    <div className="bg-brand-pink/20 p-3 rounded-lg mr-4">
+                      <Mail className="h-6 w-6 text-brand-pink" />
+                    </div>
+                    <div>
+                      <p className="text-gray-400 mb-1">Email</p>
+                      <a
+                        href="mailto:steve@webfuzsion.co.uk"
+                        className="text-xl font-medium text-white hover:text-brand-pink transition-colors"
+                      >
+                        steve@webfuzsion.co.uk
+                      </a>
+                    </div>
+                  </motion.div>
+
+                  <motion.div whileHover={{ x: isMobile ? 0 : 5 }} className="flex items-start">
+                    <div className="bg-brand-pink/20 p-3 rounded-lg mr-4">
+                      <MessageSquare className="h-6 w-6 text-brand-pink" />
+                    </div>
+                    <div>
+                      <p className="text-gray-400 mb-1">Social Media</p>
+                      <p className="text-xl font-medium text-white">
+                        Facebook & Instagram <span className="text-gray-400 text-base">- Coming Soon</span>
+                      </p>
+                    </div>
+                  </motion.div>
+                </div>
+              </AnimatedSection>
+
+              <AnimatedSection delay={0.4} disableOnFastScroll={isScrollingFast}>
+                <ContactForm />
+              </AnimatedSection>
+            </div>
+          </div>
+        </section>
       </div>
 
-      <Header />
-      <AnimatedHero />
-      <AnimatedFeatures />
-      <AnimatedServices />
-      <AnimatedTestimonials />
-      <AnimatedContact />
       <Footer />
     </div>
   )
