@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation"
 import RichTextEditor from "../../components/rich-text-editor"
 import BlogPreview from "../../components/blog-preview"
 import { saveBlogPost } from "../../../actions/blog-actions"
+import "./blog-styles.css"
 
 export default function NewBlogPost() {
   const router = useRouter()
@@ -14,8 +15,8 @@ export default function NewBlogPost() {
   const [slug, setSlug] = useState("")
   const [excerpt, setExcerpt] = useState("")
   const [content, setContent] = useState("")
-  const [author, setAuthor] = useState("")
-  const [category, setCategory] = useState("")
+  const [author, setAuthor] = useState("WebFuZsion")
+  const [category, setCategory] = useState("Web Design")
   const [tags, setTags] = useState("")
   const [image, setImage] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -28,16 +29,17 @@ export default function NewBlogPost() {
     setMessage({ type: "", text: "" })
 
     try {
-      const result = await saveBlogPost({
-        title,
-        slug,
-        excerpt,
-        content,
-        author,
-        category,
-        tags: tags.split(",").map((tag) => tag.trim()),
-        image,
-      })
+      const formData = new FormData()
+      formData.append("title", title)
+      formData.append("slug", slug)
+      formData.append("excerpt", excerpt)
+      formData.append("content", content)
+      formData.append("author", author)
+      formData.append("category", category)
+      formData.append("tags", tags)
+      formData.append("image", image)
+
+      const result = await saveBlogPost(formData)
 
       if (result.success) {
         setMessage({ type: "success", text: "Blog post published successfully!" })
@@ -200,14 +202,19 @@ Another paragraph with more content.`
                   <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
                     Category *
                   </label>
-                  <input
-                    type="text"
+                  <select
                     id="category"
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                     required
-                  />
+                  >
+                    <option value="Web Design">Web Design</option>
+                    <option value="SEO">SEO</option>
+                    <option value="Business">Business</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Technology">Technology</option>
+                  </select>
                 </div>
 
                 <div>

@@ -22,6 +22,30 @@ export default function BlogPreview({ title, content, excerpt, author, image }: 
     return <div className="p-8 text-center">Loading preview...</div>
   }
 
+  // Custom components for ReactMarkdown to ensure proper styling
+  const components = {
+    h1: ({ node, ...props }: any) => <h1 className="text-3xl font-bold mt-8 mb-4" {...props} />,
+    h2: ({ node, ...props }: any) => <h2 className="text-2xl font-bold mt-6 mb-3" {...props} />,
+    h3: ({ node, ...props }: any) => <h3 className="text-xl font-bold mt-5 mb-2" {...props} />,
+    p: ({ node, ...props }: any) => <p className="my-4" {...props} />,
+    a: ({ node, ...props }: any) => <a className="text-blue-600 underline" {...props} />,
+    ul: ({ node, ...props }: any) => <ul className="list-disc pl-6 my-4" {...props} />,
+    ol: ({ node, ...props }: any) => <ol className="list-decimal pl-6 my-4" {...props} />,
+    li: ({ node, ...props }: any) => <li className="mb-1" {...props} />,
+    blockquote: ({ node, ...props }: any) => (
+      <blockquote className="border-l-4 border-gray-300 pl-4 italic my-4" {...props} />
+    ),
+    img: ({ node, ...props }: any) => <img className="my-6 rounded-lg max-w-full" {...props} />,
+    code: ({ node, inline, ...props }: any) =>
+      inline ? (
+        <code className="bg-gray-100 px-1 rounded" {...props} />
+      ) : (
+        <pre className="bg-gray-100 p-4 rounded-lg overflow-x-auto my-4">
+          <code {...props} />
+        </pre>
+      ),
+  }
+
   return (
     <div className="max-w-4xl mx-auto bg-white rounded-lg overflow-hidden shadow">
       <div className="p-6">
@@ -46,12 +70,12 @@ export default function BlogPreview({ title, content, excerpt, author, image }: 
           </div>
         )}
 
-        <div className="prose max-w-none mb-6">
+        <div className="mb-6">
           <p className="text-lg font-medium text-gray-700">{excerpt || "Blog post excerpt..."}</p>
         </div>
 
-        <div className="prose prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-p:my-4 prose-a:text-blue-600 prose-a:underline prose-img:rounded-lg prose-img:my-6 prose-ul:list-disc prose-ul:pl-6 prose-ol:list-decimal prose-ol:pl-6 max-w-none">
-          <ReactMarkdown>{content || "Blog post content..."}</ReactMarkdown>
+        <div className="blog-content">
+          <ReactMarkdown components={components}>{content || "Blog post content..."}</ReactMarkdown>
         </div>
       </div>
     </div>
