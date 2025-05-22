@@ -53,6 +53,31 @@ export default function DebugDashboard() {
       description: "Check environment variables",
     },
     {
+      name: "Admin Auth Check",
+      url: "/api/admin/check-auth",
+      description: "Test admin authentication",
+    },
+    {
+      name: "Invoice Setup Check",
+      url: "/api/admin/check-invoice-setup",
+      description: "Check if invoice system is set up",
+    },
+    {
+      name: "Invoice Tables Check",
+      url: "/api/admin/check-invoice-tables",
+      description: "Check invoice database tables",
+    },
+    {
+      name: "Get Invoices",
+      url: "/api/admin/invoices",
+      description: "Fetch all invoices from database",
+    },
+    {
+      name: "Blog Posts API",
+      url: "/api/admin/blog-posts",
+      description: "Test blog posts API",
+    },
+    {
       name: "CORS Test (GET)",
       url: "/api/debug/cors-test",
       description: "Test CORS headers with GET request",
