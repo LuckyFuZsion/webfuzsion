@@ -1,56 +1,71 @@
 import { NextResponse } from "next/server"
 import fs from "fs"
 import path from "path"
-import type { BlogPost } from "../../../blog/types"
 
 export async function GET() {
   try {
-    // This is a simplified approach - in a real app, you might use a database
-    const blogDir = path.join(process.cwd(), "app/blog")
+    // Path to the blog directory
+    const blogDir = path.join(process.cwd(), "app", "blog")
 
-    // Get all directories in the blog folder (each directory is a blog post)
+    // Get all directories in the blog folder (each blog post has its own directory)
     const entries = fs.readdirSync(blogDir, { withFileTypes: true })
-    const blogDirs = entries
-      .filter((entry) => entry.isDirectory() && !entry.name.startsWith(".") && entry.name !== "[slug]")
+
+    // Filter out directories and exclude non-blog post directories
+    const blogSlugs = entries
+      .filter((entry) => entry.isDirectory() && !["[slug]", "components", "utils"].includes(entry.name))
       .map((dir) => dir.name)
 
     // Collect blog post data
-    const posts: Partial<BlogPost>[] = []
-
-    for (const slug of blogDirs) {
+    const posts = blogSlugs.map((slug) => {
       try {
-        // Try to import the page.tsx file to extract blog post data
-        // This is a simplified approach - in a real app, you might use a database
-        const filePath = path.join(blogDir, slug, "page.tsx")
+        // Try to read the page.tsx file to extract metadata
+        const pagePath = path.join(blogDir, slug, "page.tsx")
+        if (fs.existsSync(pagePath)) {
+          const content = fs.readFileSync(pagePath, "utf8")
 
-        if (fs.existsSync(filePath)) {
-          const content = fs.readFileSync(filePath, "utf8")
+          // Extract title
+          const titleMatch = content.match(/title: ["'](.+?)["']/)
+          const title = titleMatch ? titleMatch[1] : slug
 
-          // Extract blog post data using regex (this is a simplified approach)
-          const titleMatch = content.match(/title: ['"](.+?)['"]/i)
-          const dateMatch = content.match(/date: ['"](.+?)['"]/i)
-          const authorMatch = content.match(/author: ['"](.+?)['"]/i)
-          const categoryMatch = content.match(/category: ['"](.+?)['"]/i)
+          // Extract date
+          const dateMatch = content.match(/date: ["'](.+?)["']/)
+          const date = dateMatch ? dateMatch[1] : "Unknown date"
 
-          if (titleMatch && dateMatch) {
-            posts.push({
-              slug,
-              title: titleMatch[1],
-              date: dateMatch[1],
-              author: authorMatch ? authorMatch[1] : "WebFuZsion",
-              category: categoryMatch ? categoryMatch[1] : "Web Design",
-            })
+          // Extract excerpt
+          const excerptMatch = content.match(/excerpt: ["'](.+?)["']/)
+          const excerpt = excerptMatch ? excerptMatch[1] : ""
+
+          // Extract author
+          const authorMatch = content.match(/author: ["'](.+?)["']/)
+          const author = authorMatch ? authorMatch[1] : "Unknown author"
+
+          return {
+            slug,
+            title,
+            excerpt,
+            date,
+            author,
           }
         }
-      } catch (error) {
-        console.error(`Error processing blog post ${slug}:`, error)
+      } catch (err) {
+        console.error(`Error processing blog post ${slug}:`, err)
       }
-    }
+
+      // Fallback if we couldn't extract metadata
+      return {
+        slug,
+        title: slug.replace(/-/g, " "),
+        excerpt: "",
+        date: "Unknown date",
+        author: "Unknown author",
+      }
+    })
 
     // Sort posts by date (newest first)
     posts.sort((a, b) => {
-      if (!a.date || !b.date) return 0
-      return new Date(b.date).getTime() - new Date(a.date).getTime()
+      const dateA = new Date(a.date)
+      const dateB = new Date(b.date)
+      return isNaN(dateA.getTime()) || isNaN(dateB.getTime()) ? 0 : dateB.getTime() - dateA.getTime()
     })
 
     return NextResponse.json({ posts })
