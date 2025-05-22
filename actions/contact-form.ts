@@ -2,7 +2,6 @@
 
 import { z } from "zod"
 import nodemailer from "nodemailer"
-import { getGmailConfig, getEmailAddresses } from "@/lib/gmail-config"
 import type { FormState, FormErrors } from "@/lib/form-types"
 
 // Define validation schema
@@ -31,8 +30,60 @@ function formatZodErrors(error: z.ZodError): FormErrors {
   return formattedErrors
 }
 
+// Get Gmail configuration
+function getGmailConfig() {
+  const user = process.env.GMAIL_USER
+  const password = process.env.GMAIL_APP_PASSWORD
+
+  console.log("Gmail config check - User exists:", !!user)
+  console.log("Gmail config check - Password exists:", !!password)
+
+  if (!user || !password) {
+    console.error("Gmail credentials missing. Please set GMAIL_USER and GMAIL_APP_PASSWORD environment variables.")
+    return null
+  }
+
+  return {
+    service: "gmail",
+    auth: {
+      user,
+      pass: password,
+    },
+    logger: true,
+    debug: true,
+  }
+}
+
+// Get email addresses
+function getEmailAddresses() {
+  const from = process.env.EMAIL_FROM || `"WebFuZsion" <${process.env.GMAIL_USER}>`
+  const to = process.env.EMAIL_TO || process.env.GMAIL_USER
+  const cc = process.env.EMAIL_CC ? [process.env.EMAIL_CC] : []
+
+  console.log("Email addresses check - From:", from)
+  console.log("Email addresses check - To:", to)
+  console.log("Email addresses check - CC exists:", !!process.env.EMAIL_CC)
+
+  if (!from || !to) {
+    console.error("Email addresses missing. Please set EMAIL_FROM and EMAIL_TO environment variables.")
+    return null
+  }
+
+  return { from, to, cc }
+}
+
 export async function submitContactForm(prevState: FormState, formData: FormData): Promise<FormState> {
   try {
+    console.log("Contact form submission started")
+
+    // Log environment variables (without values)
+    console.log("Environment variables check:")
+    console.log("GMAIL_USER exists:", !!process.env.GMAIL_USER)
+    console.log("GMAIL_APP_PASSWORD exists:", !!process.env.GMAIL_APP_PASSWORD)
+    console.log("EMAIL_FROM exists:", !!process.env.EMAIL_FROM)
+    console.log("EMAIL_TO exists:", !!process.env.EMAIL_TO)
+    console.log("EMAIL_CC exists:", !!process.env.EMAIL_CC)
+
     // Extract form data
     const rawFormData = {
       name: formData.get("name")?.toString().trim() || "",
@@ -42,7 +93,13 @@ export async function submitContactForm(prevState: FormState, formData: FormData
       message: formData.get("message")?.toString().trim() || "",
     }
 
-    console.log("Form data received:", rawFormData)
+    console.log("Form data received:", {
+      name: rawFormData.name,
+      email: rawFormData.email,
+      subject: rawFormData.subject,
+      enquiryType: rawFormData.enquiryType,
+      messageLength: rawFormData.message.length,
+    })
 
     // Validate form data
     const validationResult = FormSchema.safeParse(rawFormData)
@@ -84,18 +141,28 @@ export async function submitContactForm(prevState: FormState, formData: FormData
 
     console.log("Email addresses retrieved successfully")
 
-    // If there's a hardcoded recipient email, update it
-    const recipientEmail = process.env.EMAIL_TO || "info.webfuzsion@gmail.com"
-    console.log("Recipient email:", recipientEmail)
-
     // Create email transporter with Gmail
     const transporter = nodemailer.createTransport(gmailConfig)
     console.log("Transporter created successfully")
 
+    // Verify connection
+    try {
+      console.log("Verifying email connection...")
+      await transporter.verify()
+      console.log("Email connection verified successfully")
+    } catch (verifyError) {
+      console.error("Email connection verification failed:", verifyError)
+      return {
+        success: false,
+        message: "Email server connection failed. Please try again later.",
+        errors: {},
+      }
+    }
+
     // Email content
     const mailOptions = {
       from: emailAddresses.from,
-      to: recipientEmail,
+      to: emailAddresses.to,
       cc: emailAddresses.cc,
       subject: `WebFuZsion Contact: ${subject}`,
       html: `
@@ -119,10 +186,14 @@ export async function submitContactForm(prevState: FormState, formData: FormData
     // Send email
     try {
       const info = await transporter.sendMail(mailOptions)
-      console.log("Email sent successfully:", info)
+      console.log("Email sent successfully:", info.messageId)
     } catch (emailError) {
       console.error("Error sending email:", emailError)
-      throw emailError
+      return {
+        success: false,
+        message: "Failed to send email. Please try again later.",
+        errors: {},
+      }
     }
 
     return {
