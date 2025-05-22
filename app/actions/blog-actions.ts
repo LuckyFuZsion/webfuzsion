@@ -6,7 +6,7 @@ import path from "path"
 import type { BlogPost } from "../blog/types"
 
 // Function to generate a slug from a title
-export function generateSlug(title: string): string {
+export async function generateSlug(title: string): Promise<string> {
   return title
     .toLowerCase()
     .replace(/[^\w\s-]/g, "")
@@ -36,7 +36,7 @@ export async function saveBlogPost(formData: FormData): Promise<{ success: boole
     }
 
     // Generate slug from title
-    const slug = generateSlug(title)
+    const slug = await generateSlug(title)
 
     // Calculate reading time (rough estimate: 200 words per minute)
     const wordCount = content.split(/\s+/).length
