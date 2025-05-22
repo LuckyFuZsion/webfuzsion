@@ -87,7 +87,21 @@ export function PortfolioCardDeck({ items }: PortfolioCardDeckProps) {
 
               <div className="aspect-square relative">
                 <Image
-                  src="https://gxciioabwrkahdfe.public.blob.vercel-storage.com/logos/jammmy-xQgcWSmIIQC96FjnToLlxBTphURhnE.png"
+                  src={
+                    item.title === "Sharky's Bar"
+                      ? "https://gxciioabwrkahdfe.public.blob.vercel-storage.com/logos/Sharkys-VN9QauIaJZSEQQhU5FcF4vHbiQURA4.jpg"
+                      : item.title === "JammmySlots"
+                        ? "https://gxciioabwrkahdfe.public.blob.vercel-storage.com/logos/jammmy-xQgcWSmIIQC96FjnToLlxBTphURhnE.png"
+                        : item.title === "Andy's Man and Van"
+                          ? "https://gxciioabwrkahdfe.public.blob.vercel-storage.com/logos/Andys-2TvK0A9LOccO5rBEIErGbCIjdF4lMt.jpg"
+                          : item.title === "MT Plumbing"
+                            ? "https://gxciioabwrkahdfe.public.blob.vercel-storage.com/logos/MT-nAuoFxy5fk4nVzlMddpywUeNitGWlK.jpg"
+                            : item.title === "The Painted Gardener"
+                              ? "https://gxciioabwrkahdfe.public.blob.vercel-storage.com/logos/paintedgardener-3zHP1Ss89cQsSJO8NRHjtYiZ8MOD9Y.jpg"
+                              : item.title === "Pressure Washer Coils"
+                                ? "https://gxciioabwrkahdfe.public.blob.vercel-storage.com/logos/Daz-5xDWUosKKdAjK4U7BovSrthjHRb2nO.jpg"
+                                : item.imageUrl
+                  }
                   alt={item.title}
                   fill
                   className="object-cover"

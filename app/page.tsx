@@ -715,7 +715,7 @@ export default function Home() {
           <p className="text-lg text-gray-300 text-center mb-12 max-w-3xl mx-auto">
             Find answers to common questions about our web design and development services.
           </p>
-          <FAQSection items={faqItems} />
+          <FAQSection items={faqItems} itemsPerPage={5} />
         </div>
       </section>
 

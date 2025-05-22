@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { ChevronDown } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
-import { cn } from "@/lib/utils"
 
 interface FAQItem {
   question: string
@@ -11,79 +11,97 @@ interface FAQItem {
 
 interface FAQSectionProps {
   items: FAQItem[]
-  title?: string
-  description?: string
+  itemsPerPage?: number
 }
 
-export default function FAQSection({ items, title = "Frequently Asked Questions", description }: FAQSectionProps) {
+export default function FAQSection({ items, itemsPerPage = 5 }: FAQSectionProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
+  const [visibleItems, setVisibleItems] = useState(itemsPerPage)
+  const [expanded, setExpanded] = useState(false)
+
+  const toggleItem = (index: number) => {
+    setOpenIndex(openIndex === index ? null : index)
+  }
+
+  const loadMore = () => {
+    setVisibleItems(items.length)
+    setExpanded(true)
+  }
+
+  const showLess = () => {
+    setVisibleItems(itemsPerPage)
+    setExpanded(false)
+    // If the open item will be hidden, close it
+    if (openIndex !== null && openIndex >= itemsPerPage) {
+      setOpenIndex(null)
+    }
+  }
 
   return (
-    <section className="w-full py-12 md:py-24 lg:py-32">
-      <div className="container px-4 md:px-6">
-        <div className="flex flex-col items-center justify-center space-y-4 text-center">
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-white">
-            {title}
-          </h2>
-          {description && (
-            <p className="max-w-[900px] text-white/80 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              {description}
-            </p>
+    <div className="max-w-3xl mx-auto">
+      <div className="space-y-4">
+        {items.slice(0, visibleItems).map((item, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: index * 0.1 }}
+            className="bg-brand-dark/50 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden"
+          >
+            <button
+              onClick={() => toggleItem(index)}
+              className="flex justify-between items-center w-full p-4 text-left focus:outline-none"
+              aria-expanded={openIndex === index}
+              aria-controls={`faq-answer-${index}`}
+            >
+              <h3 className="text-lg font-medium text-white">{item.question}</h3>
+              <ChevronDown
+                className={`h-5 w-5 text-brand-pink transition-transform duration-300 ${
+                  openIndex === index ? "transform rotate-180" : ""
+                }`}
+              />
+            </button>
+            <AnimatePresence>
+              {openIndex === index && (
+                <motion.div
+                  id={`faq-answer-${index}`}
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  <div className="p-4 pt-0 text-gray-300 border-t border-white/10">{item.answer}</div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        ))}
+      </div>
+
+      {items.length > itemsPerPage && (
+        <div className="mt-8 text-center">
+          {!expanded ? (
+            <motion.button
+              onClick={loadMore}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-brand-pink hover:bg-brand-pink/80 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+            >
+              Load More Questions
+            </motion.button>
+          ) : (
+            <motion.button
+              onClick={showLess}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-brand-dark hover:bg-brand-dark/80 text-white px-6 py-3 rounded-lg font-medium transition-colors border border-brand-pink/50"
+            >
+              Show Less
+            </motion.button>
           )}
         </div>
-        <div className="mx-auto grid max-w-4xl gap-6 py-12">
-          {items.map((item, index) => (
-            <motion.div
-              key={index}
-              className={cn(
-                "rounded-lg border border-white/10 bg-brand-dark/50 backdrop-blur-sm p-6",
-                "transition-all duration-200 ease-in-out",
-                openIndex === index ? "shadow-lg" : "hover:shadow-md"
-              )}
-              initial={false}
-              animate={{ height: "auto" }}
-            >
-              <button
-                className="flex w-full items-center justify-between text-left"
-                onClick={() => setOpenIndex(openIndex === index ? null : index)}
-              >
-                <h3 className="text-lg font-semibold text-white">{item.question}</h3>
-                <motion.div
-                  animate={{ rotate: openIndex === index ? 180 : 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="ml-4 h-5 w-5 text-white"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    className="h-5 w-5"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </motion.div>
-              </button>
-              <AnimatePresence initial={false}>
-                {openIndex === index && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="mt-4 overflow-hidden"
-                  >
-                    <p className="text-white/80">{item.answer}</p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
+      )}
+    </div>
   )
 }

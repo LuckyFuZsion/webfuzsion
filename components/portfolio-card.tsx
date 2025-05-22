@@ -37,7 +37,21 @@ export function PortfolioCard({ title, type, imageUrl, websiteUrl }: PortfolioCa
       <div className="aspect-square relative overflow-hidden">
         <motion.div whileHover={{ scale: 1.1 }} transition={{ duration: 0.5 }} className="h-full w-full">
           <Image
-            src="https://gxciioabwrkahdfe.public.blob.vercel-storage.com/logos/jammmy-xQgcWSmIIQC96FjnToLlxBTphURhnE.png"
+            src={
+              title === "Sharky's Bar"
+                ? "https://gxciioabwrkahdfe.public.blob.vercel-storage.com/logos/Sharkys-VN9QauIaJZSEQQhU5FcF4vHbiQURA4.jpg"
+                : title === "JammmySlots"
+                  ? "https://gxciioabwrkahdfe.public.blob.vercel-storage.com/logos/jammmy-xQgcWSmIIQC96FjnToLlxBTphURhnE.png"
+                  : title === "Andy's Man and Van"
+                    ? "https://gxciioabwrkahdfe.public.blob.vercel-storage.com/logos/Andys-2TvK0A9LOccO5rBEIErGbCIjdF4lMt.jpg"
+                    : title === "MT Plumbing"
+                      ? "https://gxciioabwrkahdfe.public.blob.vercel-storage.com/logos/MT-nAuoFxy5fk4nVzlMddpywUeNitGWlK.jpg"
+                      : title === "The Painted Gardener"
+                        ? "https://gxciioabwrkahdfe.public.blob.vercel-storage.com/logos/paintedgardener-3zHP1Ss89cQsSJO8NRHjtYiZ8MOD9Y.jpg"
+                        : title === "Pressure Washer Coils"
+                          ? "https://gxciioabwrkahdfe.public.blob.vercel-storage.com/logos/Daz-5xDWUosKKdAjK4U7BovSrthjHRb2nO.jpg"
+                          : imageUrl
+            }
             alt={title}
             fill
             className="object-cover"

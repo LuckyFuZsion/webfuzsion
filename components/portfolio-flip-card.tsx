@@ -144,7 +144,21 @@ export function PortfolioFlipCard({
             {/* Portfolio image - updated to use ResponsiveImage */}
             <div className="relative h-full w-full pt-0">
               <ResponsiveImage
-                src={updatedImageUrl() || "/placeholder.svg"}
+                src={
+                  title === "Sharky's Bar"
+                    ? "https://gxciioabwrkahdfe.public.blob.vercel-storage.com/logos/Sharkys-VN9QauIaJZSEQQhU5FcF4vHbiQURA4.jpg"
+                    : title === "JammmySlots"
+                      ? "https://gxciioabwrkahdfe.public.blob.vercel-storage.com/logos/jammmy-xQgcWSmIIQC96FjnToLlxBTphURhnE.png"
+                      : title === "Andy's Man and Van"
+                        ? "https://gxciioabwrkahdfe.public.blob.vercel-storage.com/logos/Andys-2TvK0A9LOccO5rBEIErGbCIjdF4lMt.jpg"
+                        : title === "MT Plumbing"
+                          ? "https://gxciioabwrkahdfe.public.blob.vercel-storage.com/logos/MT-nAuoFxy5fk4nVzlMddpywUeNitGWlK.jpg"
+                          : title === "The Painted Gardener"
+                            ? "https://gxciioabwrkahdfe.public.blob.vercel-storage.com/logos/paintedgardener-3zHP1Ss89cQsSJO8NRHjtYiZ8MOD9Y.jpg"
+                            : title === "Pressure Washer Coils"
+                              ? "https://gxciioabwrkahdfe.public.blob.vercel-storage.com/logos/Daz-5xDWUosKKdAjK4U7BovSrthjHRb2nO.jpg"
+                              : updatedImageUrl() || "/placeholder.svg"
+                }
                 alt={title}
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="h-full w-full"
