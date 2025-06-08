@@ -1,0 +1,19 @@
+/* Hide any Tag Assistant elements */
+[id^="tag-assistant"],
+[class^="tag-assistant"],
+[id^="gtm-"],
+[class^="gtm-"],
+.tagassistant,
+.tag-assistant,
+.gtm-debug,
+.gtm-tag-assistant {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: absolute !important;
+  left: -9999px !important;
+  top: -9999px !important;
+  pointer-events: none !important;
+}

@@ -1,0 +1,9 @@
+.custom-logo {
+  font-family: sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-stretch: expanded;
+  -webkit-text-stroke: 1px white;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.2);
+}

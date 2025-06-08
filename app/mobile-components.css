@@ -1,0 +1,53 @@
+/* Mobile component styles */
+@media (max-width: 767px) {
+  /* Clean, modern card styles */
+  .rounded-xl {
+    border-radius: 12px;
+  }
+
+  /* Light background for cards */
+  .bg-gray-50 {
+    background-color: #f9fafb;
+  }
+
+  /* Shadow for cards */
+  .shadow-md {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Navigation dots */
+  .bg-brand-blue {
+    background-color: #0077cc;
+  }
+
+  .bg-brand-blue\/30 {
+    background-color: rgba(0, 119, 204, 0.3);
+  }
+
+  /* Text colors */
+  .text-brand-dark {
+    color: #0a0a14;
+  }
+
+  .text-gray-600 {
+    color: #4b5563;
+  }
+
+  .text-gray-700 {
+    color: #374151;
+  }
+
+  /* Button styles */
+  .bg-brand-blue {
+    background-color: #0077cc;
+  }
+
+  .hover\:bg-brand-blue\/90:hover {
+    background-color: rgba(0, 119, 204, 0.9);
+  }
+
+  /* Navigation arrows */
+  .rounded-full {
+    border-radius: 9999px;
+  }
+}

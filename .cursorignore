@@ -1,0 +1,30 @@
+# Cursor ignore file - minimal exclusions to ensure all files are visible
+# Only exclude truly unnecessary files
+
+# Node modules (keep this exclusion for performance)
+node_modules/
+
+# Build outputs (optional - you may want to see these)
+# .next/
+# dist/
+# build/
+
+# Explicitly allow .env files
+!.env
+!.env.* 
+
+# Logs (optional - you may want to see these)
+# *.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files (optional - you may want to see these)
+# .vscode/
+# .idea/ 

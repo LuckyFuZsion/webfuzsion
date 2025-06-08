@@ -1,0 +1,49 @@
+/* Card Deck Styles */
+.card-deck-container {
+  perspective: 1000px;
+}
+
+.card-deck-card {
+  transition: transform 0.5s ease-out;
+}
+
+.card-deck-shadow {
+  position: absolute;
+  bottom: -10px;
+  left: 10%;
+  right: 10%;
+  height: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  filter: blur(10px);
+  border-radius: 50%;
+  transform: scaleX(0.8);
+  opacity: 0.6;
+  transition: all 0.5s ease-out;
+}
+
+.card-deck-instruction {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}
+
+/* Fallback styles for mobile */
+@media (max-width: 767px) {
+  .card-deck-container {
+    perspective: none;
+  }
+
+  .card-deck-card {
+    transform-style: flat !important;
+  }
+}

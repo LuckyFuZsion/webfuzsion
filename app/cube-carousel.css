@@ -1,0 +1,39 @@
+/* 3D Cube Carousel Styles */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+/* Custom scrollbar for pricing features */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 0, 153, 0.3) rgba(0, 0, 0, 0.1);
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 0, 153, 0.3);
+  border-radius: 4px;
+}
+
+/* Fallback styles for mobile */
+@media (max-width: 767px) {
+  .transform-style-3d {
+    transform-style: flat;
+  }
+}

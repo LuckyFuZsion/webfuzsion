@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clean Invoice</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    .invoice {
+      width: 80%;
+      margin: 0 auto;
+      border: 1px solid #ccc;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .company-info {
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    .invoice-details {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .billing-info, .shipping-info {
+      width: 45%;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    .total {
+      text-align: right;
+      font-weight: bold;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="invoice">
+    <div class="header">
+      <h1>Invoice</h1>
+    </div>
+
+    <div class="company-info">
+      <h2>Your Company Name</h2>
+      <p>123 Main Street</p>
+      <p>Anytown, USA 12345</p>
+      <p>Phone: (555) 555-5555</p>
+      <p>Email: info@example.com</p>
+    </div>
+
+    <div class="invoice-details">
+      <div class="billing-info">
+        <h3>Bill To:</h3>
+        <p>Client Name</p>
+        <p>Client Address</p>
+        <p>Client City, State, Zip</p>
+      </div>
+
+      <div class="shipping-info">
+        <h3>Ship To:</h3>
+        <p>Client Name</p>
+        <p>Client Address</p>
+        <p>Client City, State, Zip</p>
+      </div>
+
+      <div>
+        <p><strong>Invoice Number:</strong> INV-2023-001</p>
+        <p><strong>Date:</strong> October 26, 2023</p>
+        <p><strong>Due Date:</strong> November 9, 2023</p>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Description</th>
+          <th>Quantity</th>
+          <th>Unit Price</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Item 1</td>
+          <td>Description of Item 1</td>
+          <td>2</td>
+          <td>$50.00</td>
+          <td>$100.00</td>
+        </tr>
+        <tr>
+          <td>Item 2</td>
+          <td>Description of Item 2</td>
+          <td>1</td>
+          <td>$100.00</td>
+          <td>$100.00</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="total">
+      <p><strong>Subtotal:</strong> $200.00</p>
+      <p><strong>Tax (0%):</strong> $0.00</p>
+      <p><strong>Total:</strong> $200.00</p>
+    </div>
+
+    <div class="footer">
+      <p>Thank you for your business!</p>
+      <p>Please make payment to: Steven Platts • Sort Code: 110333 • Account: 00577966</p>
+    </div>
+  </div>
+
+</body>
+</html>

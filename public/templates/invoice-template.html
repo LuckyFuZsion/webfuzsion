@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <meta charset="utf-8">
+ <title>Invoice</title>
+ <style>
+   body {
+     font-family: Arial, sans-serif;
+     margin: 0;
+     padding: 20px;
+     color: #333;
+   }
+   .container {
+     max-width: 800px;
+     margin: 0 auto;
+     padding: 30px;
+     border: 1px solid #eee;
+     box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+   }
+   .header {
+     display: flex;
+     justify-content: space-between;
+     margin-bottom: 20px;
+   }
+   .company-info {
+     text-align: left;
+   }
+   .invoice-info {
+     text-align: right;
+   }
+   .customer-info {
+     margin-bottom: 20px;
+   }
+   .bill-to {
+     float: left;
+     width: 50%;
+   }
+   .invoice-details {
+     float: right;
+     width: 50%;
+     text-align: right;
+   }
+   .clear {
+     clear: both;
+   }
+   table {
+     width: 100%;
+     border-collapse: collapse;
+     margin-bottom: 20px;
+   }
+   th, td {
+     padding: 10px;
+     border-bottom: 1px solid #ddd;
+     text-align: left;
+   }
+   th {
+     background-color: #f8f8f8;
+   }
+   .amount {
+     text-align: right;
+   }
+   .total-section {
+     margin-top: 20px;
+     text-align: right;
+   }
+   .total-row {
+     display: flex;
+     justify-content: flex-end;
+     margin-bottom: 5px;
+   }
+   .total-label {
+     width: 150px;
+     text-align: right;
+     padding-right: 20px;
+   }
+   .total-amount {
+     width: 100px;
+     text-align: right;
+   }
+   .grand-total {
+     font-weight: bold;
+     font-size: 1.2em;
+     border-top: 2px solid #333;
+     padding-top: 5px;
+   }
+   .notes {
+     margin-top: 30px;
+     padding: 10px;
+     background-color: #f8f8f8;
+   }
+   .footer {
+     margin-top: 30px;
+     text-align: center;
+     color: #777;
+     font-size: 0.9em;
+   }
+   .discount {
+     color: #e53e3e;
+   }
+   .original-price {
+     text-decoration: line-through;
+     color: #666;
+     font-size: 0.9em;
+   }
+   @media print {
+     body {
+       -webkit-print-color-adjust: exact;
+     }
+   }
+ </style>
+</head>
+<body>
+ <div class="container">
+   <div class="header">
+     <div class="company-info">
+       <h1>WebFuZsion</h1>
+       <p>Grantham, UK<br>steve@luckyfuzsion.com</p>
+     </div>
+     <div class="invoice-info">
+       <h1>INVOICE</h1>
+       <p>Invoice #: {{invoice.invoice_number}}</p>
+       <p>Date: {{invoice.issue_date}}</p>
+       <p>Due Date: {{invoice.due_date}}</p>
+     </div>
+   </div>
+
+   <div class="customer-info">
+     <div class="bill-to">
+       <h3>Bill To:</h3>
+       <p>
+         {{customer.name}}<br>
+         {{customer.email}}<br>
+         {{#if customer.phone}}{{customer.phone}}<br>{{/if}}
+         {{#if customer.address}}{{customer.address}}<br>{{/if}}
+         {{#if customer.city}}{{customer.city}}{{/if}} {{#if customer.postal_code}}{{customer.postal_code}}{{/if}}<br>
+         {{customer.country}}
+       </p>
+     </div>
+     <div class="invoice-details">
+       <h3>Project:</h3>
+       <p>{{invoice.project_name}}</p>
+       <p>Status: {{invoice.status}}</p>
+     </div>
+     <div class="clear"></div>
+   </div>
+
+   <table>
+     <thead>
+       <tr>
+         <th>Description</th>
+         <th>Quantity</th>
+         <th>Unit Price</th>
+         <th>Discount</th>
+         <th class="amount">Amount</th>
+       </tr>
+     </thead>
+     <tbody>
+       {{#each items}}
+       <tr>
+         <td>{{this.description}}</td>
+         <td>{{this.quantity}}</td>
+         <td>£{{this.unit_price}}</td>
+         <td>
+           {{#if this.discount_percentage}}
+             {{this.discount_percentage}}% (£{{this.discount_amount}})
+           {{else}}
+             -
+           {{/if}}
+         </td>
+         <td class="amount">
+           {{#if this.discount_percentage}}
+             <div>
+               <div class="original-price">£{{this.original_amount}}</div>
+               <div>£{{this.amount}}</div>
+             </div>
+           {{else}}
+             £{{this.amount}}
+           {{/if}}
+         </td>
+       </tr>
+       {{/each}}
+     </tbody>
+   </table>
+
+   <div class="total-section">
+     {{#if has_discounts}}
+     <div class="total-row">
+       <div class="total-label">Original Subtotal:</div>
+       <div class="total-amount">£{{invoice.original_subtotal}}</div>
+     </div>
+     <div class="total-row">
+       <div class="total-label">Item Discounts:</div>
+       <div class="total-amount discount">-£{{invoice.total_item_discounts}}</div>
+     </div>
+     {{/if}}
+     
+     <div class="total-row">
+       <div class="total-label">Subtotal:</div>
+       <div class="total-amount">£{{invoice.subtotal}}</div>
+     </div>
+     
+     {{#if invoice.discount_amount}}
+     <div class="total-row">
+       <div class="total-label">Additional Discount:</div>
+       <div class="total-amount discount">-£{{invoice.discount_amount}}</div>
+     </div>
+     {{/if}}
+     
+     <div class="total-row grand-total">
+       <div class="total-label">Total:</div>
+       <div class="total-amount">£{{invoice.total_amount}}</div>
+     </div>
+     
+     {{#if invoice.total_discount}}
+     <div style="font-size: 0.9em; color: #666; font-style: italic; margin-top: 5px;">
+       Total Savings: £{{invoice.total_discount}} ({{invoice.discount_percentage}}%)
+     </div>
+     {{/if}}
+   </div>
+
+   {{#if invoice.notes}}
+   <div class="notes">
+     <h3>Notes</h3>
+     <p>{{invoice.notes}}</p>
+   </div>
+   {{/if}}
+
+   {{#if invoice.terms}}
+   <div class="notes">
+     <h3>Terms & Conditions</h3>
+     <p>{{invoice.terms}}</p>
+   </div>
+   {{/if}}
+
+   <div class="footer">
+     <p>Thank you for your business!</p>
+     <p>Please make payment to: Steven Platts • Sort Code: 110333 • Account: 00577966</p>
+   </div>
+ </div>
+</body>
+</html>
