@@ -42,7 +42,7 @@ export function WebDesignBusinessJsonLd() {
             opens: "09:00",
             closes: "17:00",
           },
-          sameAs: ["https://www.facebook.com/webfuzsion", "https://www.instagram.com/webfuzsion"],
+          sameAs: ["https://www.facebook.com/profile.php?id=61575611918979"],
           priceRange: "££",
           servesCuisine: "Web Design Services",
           description:

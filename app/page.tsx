@@ -775,9 +775,14 @@ export default function Home() {
                   </div>
                   <div>
                     <p className="text-gray-400 mb-1">Social Media</p>
-                    <p className="text-xl font-medium text-white">
-                      Facebook & Instagram <span className="text-gray-400 text-base">- Coming Soon</span>
-                    </p>
+                    <a
+                      href="https://www.facebook.com/profile.php?id=61575611918979"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xl font-medium text-white hover:text-brand-pink transition-colors"
+                    >
+                      Facebook
+                    </a>
                   </div>
                 </motion.div>
               </div>

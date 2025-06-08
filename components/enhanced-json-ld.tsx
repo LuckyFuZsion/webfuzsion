@@ -34,8 +34,7 @@ export default function EnhancedJsonLd({
     url: "https://webfuzsion.co.uk",
     logo: "https://webfuzsion.co.uk/images/webfuzsion-logo.png",
     sameAs: [
-      "https://www.facebook.com/webfuzsion",
-      "https://www.instagram.com/webfuzsion",
+      "https://www.facebook.com/profile.php?id=61575611918979",
       "https://www.linkedin.com/company/webfuzsion",
     ],
     contactPoint: {

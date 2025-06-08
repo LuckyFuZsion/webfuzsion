@@ -101,7 +101,7 @@ export function Footer() {
                 <span className="text-gray-300">Social Media:</span>
                 <div className="flex space-x-3 ml-2">
                   <a
-                    href="https://www.facebook.com/share/18y5fzqjmp/?mibextid=wwXIfr"
+                    href="https://www.facebook.com/profile.php?id=61575611918979"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-gray-400 hover:text-brand-pink transition-colors flex items-center"
